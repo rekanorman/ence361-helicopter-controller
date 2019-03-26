@@ -58,6 +58,14 @@ readCircBuf (circBuf_t *buffer)
     return entry;
 }
 
+/*
+ * Read the oldest value in the buffer, that is, the next value
+ * to be overwritten.
+ */
+uint32_t readEarliestValueCircBuf(circBuf_t *buffer) {
+    return buffer->data[buffer->windex];
+}
+
 // *******************************************************
 // freeCircBuf: Releases the memory allocated to the buffer data,
 // sets pointer to NULL and ohter fields to 0. The buffer can

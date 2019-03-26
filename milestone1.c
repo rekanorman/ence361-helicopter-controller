@@ -56,6 +56,10 @@ static circBuf_t inBuffer;                  // Buffer of size BUF_SIZE integers 
 static uint8_t displayUpdateTick = false;  // When true, should update display
 static uint8_t displayState = DISPLAY_ALTITUDE_PERCENT;
 static uint16_t referenceSample;  // Mean ADC sample corresponding to 'landed' altitude
+static uint16_t meanADC;    // The current mean ADC value.
+static uint32_t sumADC; // The current sum of the ADC from the buffer.
+
+static uint16_t numSamplesTaken = 0;    // The number of ADC samples measured.
 
 //*****************************************************************************
 // The interrupt handler for the for SysTick interrupt.
@@ -82,12 +86,19 @@ void SysTickIntHandler(void) {
 //*****************************************************************************
 void ADCIntHandler(void) {
     uint32_t ulValue;
+    uint32_t lastValue;
 
     // Get the single sample from ADC0.
     ADCSequenceDataGet(ADC0_BASE, 3, &ulValue);
+    numSamplesTaken += 1;
 
+    lastValue = readEarliestValueCircBuf(&inBuffer);
     // Place it in the circular buffer (advancing write index)
     writeCircBuf(&inBuffer, ulValue);
+
+    // Adjust the current sum and calculate new mean ADC.
+    sumADC = sumADC - lastValue + ulValue;
+    meanADC = (2 * sumADC + BUF_SIZE) / 2 / BUF_SIZE;
 
     // Clean up, clearing the interrupt
     ADCIntClear(ADC0_BASE, 3);
@@ -148,19 +159,6 @@ void initDisplay(void) {
 }
 
 //*****************************************************************************
-// Calculates and returns the rounded mean of the samples currently in the
-// buffer.
-// Note: should not be called until at least BUFF_SIZE samples have been taken.
-//*****************************************************************************
-uint16_t calculateMeanSample(void) {
-    uint32_t sum = 0, i = 0;
-    for (i = 0; i < BUF_SIZE; i++) {
-        sum = sum + readCircBuf(&inBuffer);
-    }
-    return (2 * sum + BUF_SIZE) / 2 / BUF_SIZE;
-}
-
-//*****************************************************************************
 // Calculates and returns the current percentage altitude, based on the mean
 // sample value and relative to the global referenceSample, which represents
 // the landed altitude.
@@ -188,7 +186,7 @@ void checkButtons(void) {
 
     // Recalculate the reference sample value when the LEFT button is pushed.
     if (checkButton(LEFT) == PUSHED) {
-        referenceSample = calculateMeanSample();
+        referenceSample = meanADC;
     }
 }
 
@@ -198,8 +196,7 @@ void checkButtons(void) {
 // value of the global displayState.
 //*****************************************************************************
 void updateDisplay(void) {
-    uint16_t meanSample = calculateMeanSample();
-    uint16_t altitudePercent = calculateAltitudePercent(meanSample);
+    uint16_t altitudePercent = calculateAltitudePercent(meanADC);
 
     char string[MAX_STR_LEN + 1];
 
@@ -207,7 +204,7 @@ void updateDisplay(void) {
         usnprintf(string, sizeof(string), "Altitude: %3d%%", altitudePercent);
 
     } else if (displayState == DISPLAY_MEAN_ADC) {
-        usnprintf(string, sizeof(string), "Mean ADC: %4d", meanSample);
+        usnprintf(string, sizeof(string), "Mean ADC: %4d", meanADC);
 
     } else {
         usnprintf(string, sizeof(string), "                ");
@@ -232,8 +229,11 @@ int main(void) {
 
     // Wait 0.5s so that the buffer to be filled with samples, then calculate
     // the initial reference sample value.
-    SysCtlDelay(SysCtlClockGet() / 6);
-    referenceSample = calculateMeanSample();
+    // SysCtlDelay(SysCtlClockGet() / 6);
+
+    // Wait for enough samples to be read before setting referenceSample.
+    while (numSamplesTaken < BUF_SIZE);
+    referenceSample = meanADC;
 
     while (1) {
         checkButtons();
