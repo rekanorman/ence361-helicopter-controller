@@ -33,6 +33,7 @@
 //*****************************************************************************
 enum displayStates {DISPLAY_ALTITUDE_PERCENT = 0,
                     DISPLAY_MEAN_ADC,
+                    DISPLAY_YAW,
                     DISPLAY_BLANK,
                     NUM_DISPLAY_STATES
                    };
@@ -58,8 +59,10 @@ static uint8_t displayState = DISPLAY_ALTITUDE_PERCENT;
 static uint16_t referenceSample;  // Mean ADC sample corresponding to 'landed' altitude
 static uint16_t meanADC;    // The current mean ADC value.
 static uint32_t sumADC; // The current sum of the ADC from the buffer.
+static uint16_t yawAngle;   // The current yaw angle.
 
 static uint16_t numSamplesTaken = 0;    // The number of ADC samples measured.
+static uint16_t yawChange = 0;      // the change in yaw since the last angle update.
 
 //*****************************************************************************
 // The interrupt handler for the for SysTick interrupt.
@@ -105,6 +108,29 @@ void ADCIntHandler(void) {
 }
 
 //*****************************************************************************
+//
+// The interrupt handler for the for pin change interrupt for port B.
+//
+//*****************************************************************************
+void portBIntHandler(void)
+{
+    static bool Pin1 = false;   // Whether the port B pin
+
+    if (GPIOIntStatus(GPIO_PORTB_BASE, false) &= 1) {
+        // pin B0 has fired
+        if (Pin1) { // if pin B1 fired first
+            yawChange--;
+        } else {
+            yawChange++;
+        }
+        Pin1 = false;
+    } else {
+        // pin B1 has fired
+        Pin1 = true;
+    }
+}
+
+//*****************************************************************************
 // Initialisation functions for the clock (incl. SysTick)
 //*****************************************************************************
 void initClock(void) {
@@ -121,6 +147,15 @@ void initClock(void) {
     // Enable interrupt and device
     SysTickIntEnable();
     SysTickEnable();
+}
+
+void initPinChangeInt(void) {
+
+    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1);
+
+    GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_RISING_EDGE);
+
+    GPIOIntRegister(GPIO_PORTB_BASE, portBIntHandler);
 }
 
 void initADC(void) {
@@ -206,6 +241,9 @@ void updateDisplay(void) {
     } else if (displayState == DISPLAY_MEAN_ADC) {
         usnprintf(string, sizeof(string), "Mean ADC: %4d", meanADC);
 
+    } else if (displayState == DISPLAY_YAW) {
+        usnprintf(string, sizeof(string), "Current Yaw: %4d", yawAngle);
+
     } else {
         usnprintf(string, sizeof(string), "                ");
     }
@@ -223,6 +261,7 @@ int main(void) {
     initDisplay();
     initCircBuf(&inBuffer, BUF_SIZE);
     initButtons();
+    initPinChangeInt();
 
     // Enable interrupts to the processor once initialisation is complete.
     IntMasterEnable();
@@ -240,6 +279,10 @@ int main(void) {
         if (displayUpdateTick) {
             displayUpdateTick = false;
             updateDisplay();
+        }
+        if (yawChange) {
+            yawAngle + (yawChange * 3.21);
+            yawChange = 0;
         }
     }
 }
