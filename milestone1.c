@@ -37,8 +37,8 @@ enum displayStates {DISPLAY_ALTITUDE_PERCENT = 0,
                     NUM_DISPLAY_STATES
                    };
 
-#define BUF_SIZE                40
-#define SAMPLE_RATE_HZ          400
+#define BUF_SIZE                20
+#define SAMPLE_RATE_HZ          200
 #define DISPLAY_UPDATE_RATE_HZ  5
 #define MAX_STR_LEN             16
 
@@ -46,13 +46,13 @@ enum displayStates {DISPLAY_ALTITUDE_PERCENT = 0,
 #define ADC_INPUT_CHANNEL       ADC_CTL_CH9
 
 // The range over which the ADC sample values vary, from landed to fully up.
-// Calculated as: 4095 * (0.8V / 3V)
-#define SAMPLE_RANGE            1092
+// Calculated as: 4095 * (0.8V / 3.3V)
+#define SAMPLE_RANGE            993
 
 //*****************************************************************************
 // Global variables
 //*****************************************************************************
-static circBuf_t inBuffer;                  // Buffer of size BUF_SIZE integers (sample values)
+static circBuf_t inBuffer;                 // Buffer of size BUF_SIZE integers (sample values)
 static uint8_t displayUpdateTick = false;  // When true, should update display
 static uint8_t displayState = DISPLAY_ALTITUDE_PERCENT;
 static uint16_t referenceSample;  // Mean ADC sample corresponding to 'landed' altitude
