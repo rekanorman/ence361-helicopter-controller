@@ -59,10 +59,13 @@ static uint8_t displayState = DISPLAY_ALTITUDE_PERCENT;
 static uint16_t referenceSample;  // Mean ADC sample corresponding to 'landed' altitude
 static uint16_t meanADC;    // The current mean ADC value.
 static uint32_t sumADC; // The current sum of the ADC from the buffer.
-static uint16_t yawAngle;   // The current yaw angle.
+static uint16_t yawAngle = 0;   // The current yaw angle.
 
 static uint16_t numSamplesTaken = 0;    // The number of ADC samples measured.
 static uint16_t yawChange = 0;      // the change in yaw since the last angle update.
+static bool dectectingUp = true;
+static bool pin1;   // Whether the port B pin
+static uint8_t delta = 1;   // Whether the port B pin
 
 //*****************************************************************************
 // The interrupt handler for the for SysTick interrupt.
@@ -114,23 +117,44 @@ void ADCIntHandler(void) {
 //*****************************************************************************
 void portBIntHandler(void)
 {
-    static bool Pin1 = false;   // Whether the port B pin
-
-    if (GPIOIntStatus(GPIO_PORTB_BASE, false) &= 1) {
+    if (GPIOIntStatus(GPIO_PORTB_BASE, false) & GPIO_INT_PIN_0) {
         // pin B0 has fired
-        if (Pin1) { // if pin B1 fired first
-            yawChange--;
+        if (pin1) { // if pin B1 fired first
+            yawChange += delta;
         } else {
-            yawChange++;
+            delta = -delta;
+            //yawChange++;
         }
-        Pin1 = false;
+        pin1 = false;
     } else {
         // pin B1 has fired
-        Pin1 = true;
+        if (!pin1) { // if pin B1 fired first
+            yawChange += delta;
+        } else {
+            delta = -delta;
+            //yawChange--;
+        }
+        pin1 = true;
     }
+    GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+//    if (GPIOIntStatus(GPIO_PORTB_BASE, false) & GPIO_INT_PIN_1) {
+//        yawChange ++;
+//    } else {
+//        yawChange --;
+//    }
+
+//    if (dectectingUp) {
+//        GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_LOW_LEVEL);
+//        dectectingUp = false;
+//    } else {
+//        GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_HIGH_LEVEL);
+//        dectectingUp = true;
+//    }
+
 }
 
-//*****************************************************************************
+//***************************************** n************************************
 // Initialisation functions for the clock (incl. SysTick)
 //*****************************************************************************
 void initClock(void) {
@@ -151,11 +175,14 @@ void initClock(void) {
 
 void initPinChangeInt(void) {
 
-    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB);
+    GPIOPinTypeGPIOInput(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    GPIOIntRegister(GPIO_PORTB_BASE, portBIntHandler);
 
     GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_RISING_EDGE);
 
-    GPIOIntRegister(GPIO_PORTB_BASE, portBIntHandler);
+    GPIOIntEnable(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1);
 }
 
 void initADC(void) {
@@ -242,7 +269,7 @@ void updateDisplay(void) {
         usnprintf(string, sizeof(string), "Mean ADC: %4d", meanADC);
 
     } else if (displayState == DISPLAY_YAW) {
-        usnprintf(string, sizeof(string), "Current Yaw: %4d", yawAngle);
+        usnprintf(string, sizeof(string), "Yaw: %4d", yawChange);
 
     } else {
         usnprintf(string, sizeof(string), "                ");
@@ -258,10 +285,10 @@ int main(void) {
     // Disable SysTick and ADC interrupts during initialisation.
     IntMasterDisable();
 
+    initPinChangeInt();
     initDisplay();
     initCircBuf(&inBuffer, BUF_SIZE);
     initButtons();
-    initPinChangeInt();
 
     // Enable interrupts to the processor once initialisation is complete.
     IntMasterEnable();
@@ -280,10 +307,10 @@ int main(void) {
             displayUpdateTick = false;
             updateDisplay();
         }
-        if (yawChange) {
-            yawAngle + (yawChange * 3.21);
-            yawChange = 0;
-        }
+//        if (yawChange) {
+//            yawAngle = (yawChange * 3.21);
+//            yawChange = 0;
+//        }
     }
 }
 
