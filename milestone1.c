@@ -59,13 +59,9 @@ static uint8_t displayState = DISPLAY_ALTITUDE_PERCENT;
 static uint16_t referenceSample;  // Mean ADC sample corresponding to 'landed' altitude
 static uint16_t meanADC;    // The current mean ADC value.
 static uint32_t sumADC; // The current sum of the ADC from the buffer.
-static uint16_t yawAngle = 0;   // The current yaw angle.
 
 static uint16_t numSamplesTaken = 0;    // The number of ADC samples measured.
 static uint16_t yawChange = 0;      // the change in yaw since the last angle update.
-static bool dectectingUp = true;
-static bool pin1;   // Whether the port B pin
-static uint8_t delta = 1;   // Whether the port B pin
 
 //*****************************************************************************
 // The interrupt handler for the for SysTick interrupt.
@@ -117,40 +113,25 @@ void ADCIntHandler(void) {
 //*****************************************************************************
 void portBIntHandler(void)
 {
-    if (GPIOIntStatus(GPIO_PORTB_BASE, false) & GPIO_INT_PIN_0) {
-        // pin B0 has fired
-        if (pin1) { // if pin B1 fired first
-            yawChange += delta;
-        } else {
-            delta = -delta;
-            //yawChange++;
+    static bool pin0 = false;
+    static bool pin1 = false;
+
+    bool nextPin0 = GPIOPinRead (GPIO_PORTB_BASE, GPIO_INT_PIN_0) == GPIO_INT_PIN_0;
+    bool nextPin1 = GPIOPinRead (GPIO_PORTB_BASE, GPIO_INT_PIN_1) == GPIO_INT_PIN_1;
+
+    if (pin0 && pin1) {
+        if (nextPin0 && !nextPin1) {
+            yawChange += 1;
+        } else if (nextPin1 && !nextPin0) {
+            yawChange -= 1;
         }
-        pin1 = false;
-    } else {
-        // pin B1 has fired
-        if (!pin1) { // if pin B1 fired first
-            yawChange += delta;
-        } else {
-            delta = -delta;
-            //yawChange--;
-        }
-        pin1 = true;
+
     }
+
+    pin0 = nextPin0;
+    pin1 = nextPin1;
+
     GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0 | GPIO_PIN_1);
-
-//    if (GPIOIntStatus(GPIO_PORTB_BASE, false) & GPIO_INT_PIN_1) {
-//        yawChange ++;
-//    } else {
-//        yawChange --;
-//    }
-
-//    if (dectectingUp) {
-//        GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_LOW_LEVEL);
-//        dectectingUp = false;
-//    } else {
-//        GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_HIGH_LEVEL);
-//        dectectingUp = true;
-//    }
 
 }
 
@@ -180,7 +161,7 @@ void initPinChangeInt(void) {
 
     GPIOIntRegister(GPIO_PORTB_BASE, portBIntHandler);
 
-    GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_RISING_EDGE);
+    GPIOIntTypeSet(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1, GPIO_BOTH_EDGES);
 
     GPIOIntEnable(GPIO_PORTB_BASE, GPIO_INT_PIN_0 | GPIO_INT_PIN_1);
 }
