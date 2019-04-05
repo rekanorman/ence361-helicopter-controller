@@ -108,7 +108,7 @@ static void initAltitudeADC(void) {
 //*****************************************************************************
 void altitudeSetInitialReference(void) {
     // Wait for the buffer to be filled before setting the reference value.
-    while (numSamplesTaken < BUF_SIZE);
+    while (numSamplesTaken < BUF_SIZE) {}
     referenceADC = meanADC;
 }
 

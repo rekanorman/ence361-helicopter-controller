@@ -1,5 +1,5 @@
 // *******************************************************
-// 
+//
 // buttons4.c
 //
 // Support for a set of FOUR specific buttons on the Tiva/Orbit.
@@ -12,7 +12,7 @@
 //
 // P.J. Bones UCECE
 // Last modified:  7.2.2018
-// 
+//
 // *******************************************************
 
 #include <stdint.h>
@@ -29,7 +29,7 @@
 // *******************************************************
 // Globals to module
 // *******************************************************
-static bool but_state[NUM_BUTS];	// Corresponds to the electrical state
+static bool but_state[NUM_BUTS];    // Corresponds to the electrical state
 static uint8_t but_count[NUM_BUTS];
 static bool but_flag[NUM_BUTS];
 static bool but_normal[NUM_BUTS];   // Corresponds to the electrical state
