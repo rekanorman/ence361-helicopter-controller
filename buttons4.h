@@ -1,5 +1,5 @@
-#ifndef BUTTONS_H_
-#define BUTTONS_H_
+#ifndef BUTTONS4_H_
+#define BUTTONS4_H_
 
 // *******************************************************
 // buttons4.h
@@ -71,4 +71,4 @@ updateButtons(void);
 uint8_t
 checkButton(uint8_t butName);
 
-#endif /*BUTTONS_H_*/
+#endif  // BUTTONS4_H_

@@ -46,4 +46,4 @@ uint32_t altitudeMeanADC(void);
 int16_t altitudePercent(void);
 
 
-#endif /* ALTITUDE_H_ */
+#endif  // ALTITUDE_H_

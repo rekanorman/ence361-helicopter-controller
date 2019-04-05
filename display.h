@@ -28,4 +28,4 @@ void displayUpdate(int16_t altitudePercent,
 void displayStateUpdate(void);
 
 
-#endif /* DISPLAY_H_ */
+#endif  // DISPLAY_H_

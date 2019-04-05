@@ -20,4 +20,4 @@ void initYaw(void);
 int16_t yawDegrees(void);
 
 
-#endif /* YAW_H_ */
+#endif  // YAW_H_

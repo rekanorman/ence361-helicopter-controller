@@ -51,4 +51,4 @@ uint32_t readEarliestValueCircBuf(circBuf_t *buffer);
 // re initialised by another call to initCircBuf().
 void freeCircBuf(circBuf_t *buffer);
 
-#endif /* CIRCBUFT_H_ */
+#endif  // CIRCBUFT_H_

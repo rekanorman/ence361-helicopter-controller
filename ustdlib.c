@@ -1090,32 +1090,27 @@ unsigned long ustrtoul(const char * restrict nptr, const char ** restrict endptr
             // Convert the character to its integer equivalent.
             //
             ulDigit = *pcPtr++ - '0';
-        }
-
         //
         // Otherwise, see if this character is an upper case letter.
         //
-        else if ((*pcPtr >= 'A') && (*pcPtr <= 'Z')) {
+        } else if ((*pcPtr >= 'A') && (*pcPtr <= 'Z')) {
             //
             // Convert the character to its integer equivalent.
             //
             ulDigit = *pcPtr++ - 'A' + 10;
-        }
-
         //
         // Otherwise, see if this character is a lower case letter.
         //
-        else if ((*pcPtr >= 'a') && (*pcPtr <= 'z')) {
+        } else if ((*pcPtr >= 'a') && (*pcPtr <= 'z')) {
             //
             // Convert the character to its integer equivalent.
             //
             ulDigit = *pcPtr++ - 'a' + 10;
-        }
 
         //
         // Otherwise, this is not a valid character.
         //
-        else {
+        } else {
             //
             // Stop converting this value.
             //
