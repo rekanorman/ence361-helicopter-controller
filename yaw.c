@@ -94,10 +94,21 @@ static void portBIntHandler(void) {
 }
 
 //*****************************************************************************
-// Calculate and return the yaw in degrees, relative to the position when
-// the program started.
+// Calculate and return the yaw in degrees, relative to the position when the
+// program started. The returned value will be between -180 and 179 inclusive.
 //*****************************************************************************
 int16_t yawDegrees(void) {
-    return yawChange * NUM_DEGREES_IN_CIRCLE / NUM_SLOTS_IN_CIRCLE;
+    // Convert yawChange to degrees.
+    int16_t degrees = yawChange * NUM_DEGREES_IN_CIRCLE / NUM_SLOTS_IN_CIRCLE;
+    // Find remainder when divided by the number of degrees in a circle.
+    degrees = degrees % NUM_DEGREES_IN_CIRCLE;
+
+    // Ensure the returned value is between -180 and 179.
+    if (degrees < -NUM_DEGREES_IN_CIRCLE / 2) {
+        degrees += NUM_DEGREES_IN_CIRCLE;
+    } else if (degrees >= NUM_DEGREES_IN_CIRCLE / 2) {
+        degrees -= NUM_DEGREES_IN_CIRCLE;
+    }
+    return degrees;
 }
 
