@@ -54,10 +54,9 @@ uint32_t readCircBuf(circBuf_t *buffer) {
     return entry;
 }
 
-/*
- * Read the oldest value in the buffer, that is, the next value
- * to be overwritten.
- */
+// *******************************************************
+// Read the oldest value in the buffer, that is, the next value
+// to be overwritten.
 uint32_t readEarliestValueCircBuf(circBuf_t *buffer) {
     return buffer->data[buffer->windex];
 }

@@ -981,12 +981,10 @@ time_t umktime(struct tm *timeptr) {
     //
     if (iSign == 0) {
         return (ulTimeGuess);
-    }
-
-    //
-    // Otherwise the time could not be converted so return an error.
-    //
-    else {
+    } else {
+        //
+        // Otherwise the time could not be converted so return an error.
+        //
         return ((unsigned long) -1);
     }
 }
