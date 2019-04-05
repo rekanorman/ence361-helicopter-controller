@@ -1,6 +1,7 @@
 //*****************************************************************************
 //
-// Module containing all functionality related to sampling the altitude.
+// Module for measuring the altitude by taking regular ADC samples and
+// averaging them.
 //
 //*****************************************************************************
 
@@ -19,8 +20,8 @@
 #define BUF_SIZE                40
 
 // The range over which the ADC sample values vary, from landed to fully up.
-// Calculated as: 4095 * (0.8V / 3V)
-#define ADC_RANGE            1092
+// Calculated as: 4095 * (0.8V / 3.3V)
+#define ADC_RANGE               993
 
 //*****************************************************************************
 // Constants related to ADC.
@@ -46,9 +47,9 @@ static circBuf_t inBuffer;
 // Number of ADC samples taken, used to check whether buffer is filled yet.
 static uint32_t numSamplesTaken = 0;
 
-static uint32_t meanADC;       // Current mean ADC value.
-static uint32_t sumADC;        // Current sum of the ADC samples in the buffer.
-static uint32_t referenceADC;  // ADC value corresponding to 'landed' altitude.
+static int32_t meanADC;       // Current mean ADC value.
+static int32_t sumADC;        // Current sum of the ADC samples in the buffer.
+static int32_t referenceADC;  // ADC value corresponding to 'landed' altitude.
 
 
 //*****************************************************************************
@@ -162,16 +163,10 @@ uint32_t altitudeMeanADC(void) {
 //*****************************************************************************
 // Calculates and returns the current percentage altitude, based on the mean
 // sample value and relative to the global referenceSample, which represents
-// the landed altitude.
+// the landed altitude. Percentage can be positive or negative
 // TODO: If this is needed for the control, it should be calculated every time
 //       a sample is taken, but for now it's just being used for display.
 //*****************************************************************************
-uint16_t altitudePercent(void) {
-    // Voltage decreases as altitude increases, so if the mean sample is
-    // greater than the reference, the helicopter must be landed.
-    if (meanADC > referenceADC) {
-        return 0;
-    }
-
+int16_t altitudePercent(void) {
     return (referenceADC - meanADC) * 100 / ADC_RANGE;
 }

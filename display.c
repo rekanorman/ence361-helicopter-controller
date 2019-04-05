@@ -43,19 +43,19 @@ void initDisplay(void) {
 // Displays the appropriate information on the OLED display, based on the
 // current displayState.
 //*****************************************************************************
-void displayUpdate(uint16_t altitudePercent,
+void displayUpdate(int16_t altitudePercent,
                    uint32_t altitudeMeanADC,
-                   uint16_t yawChange) {
+                   int16_t yawDegrees) {
     char string[MAX_STR_LEN + 1];
 
     if (displayState == DISPLAY_ALTITUDE_PERCENT) {
-        usnprintf(string, sizeof(string), "Altitude: %3d%%", altitudePercent);
+        usnprintf(string, sizeof(string), "Altitude: %5d%%", altitudePercent);
 
     } else if (displayState == DISPLAY_MEAN_ADC) {
-        usnprintf(string, sizeof(string), "Mean ADC: %4d", altitudeMeanADC);
+        usnprintf(string, sizeof(string), "Mean ADC: %4d  ", altitudeMeanADC);
 
     } else if (displayState == DISPLAY_YAW) {
-        usnprintf(string, sizeof(string), "Yaw: %4d", yawChange);
+        usnprintf(string, sizeof(string), "Yaw: %4d deg   ", yawDegrees);
 
     } else {
         usnprintf(string, sizeof(string), "                ");

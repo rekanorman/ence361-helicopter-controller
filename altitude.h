@@ -1,6 +1,7 @@
 //*****************************************************************************
 //
-// Module containing all functionality related to sampling the altitude.
+// Module for measuring the altitude by taking regular ADC samples and
+// averaging them.
 //
 //*****************************************************************************
 
@@ -38,9 +39,11 @@ void altitudeTriggerConversion(void);
 uint32_t altitudeMeanADC(void);
 
 //*****************************************************************************
-// Returns the current percentage altitude.
+// Calculates and returns the current percentage altitude, based on the mean
+// sample value and relative to the global referenceSample, which represents
+// the landed altitude. Percentage can be positive or negative
 //*****************************************************************************
-uint16_t altitudePercent(void);
+int16_t altitudePercent(void);
 
 
 #endif /* ALTITUDE_H_ */
