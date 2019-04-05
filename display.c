@@ -19,7 +19,8 @@ enum displayStates {DISPLAY_ALTITUDE_PERCENT = 0,
                     DISPLAY_MEAN_ADC,
                     DISPLAY_YAW,
                     DISPLAY_BLANK,
-                    NUM_DISPLAY_STATES};
+                    NUM_DISPLAY_STATES
+                   };
 
 // Maximum string length which can be displayed on the OLED display.
 #define MAX_STR_LEN     16

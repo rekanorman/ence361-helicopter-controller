@@ -164,7 +164,7 @@ uint32_t altitudeMeanADC(void) {
 // Calculates and returns the current percentage altitude, based on the mean
 // sample value and relative to the global referenceSample, which represents
 // the landed altitude. Percentage can be positive or negative
-// TODO: If this is needed for the control, it should be calculated every time
+// TODO(everyone): If this is needed for the control, it should be calculated every time
 //       a sample is taken, but for now it's just being used for display.
 //*****************************************************************************
 int16_t altitudePercent(void) {

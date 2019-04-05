@@ -1,8 +1,8 @@
 /*
  * OrbitOLEDInterface.c
  *
- *	This module provides function(s) which have simple inputs and behaviour to make
- *	it easy to initialise and print strings to the Orbit Boosterpack OLED disply.
+ *  This module provides function(s) which have simple inputs and behaviour to make
+ *  it easy to initialise and print strings to the Orbit Boosterpack OLED disply.
  *
  *  Created on: 23/11/2016
  *      Author: mdp46
@@ -11,17 +11,16 @@
  *      Author: mdp46
  */
 
-//TivaWare Standard Type Definitions:
+// TivaWare Standard Type Definitions:
 #include <stdbool.h>
 #include <stdint.h>
 
-//Defines and includes for Orbit OLED:
+// Defines and includes for Orbit OLED:
 #include "lib_OrbitOled/OrbitOled.h"
 #include "lib_OrbitOled/delay.h"
 #include "lib_OrbitOled/FillPat.h"
 #include "lib_OrbitOled/LaunchPad.h"
 #include "lib_OrbitOled/OrbitBoosterPackDefs.h"
-#include "lib_OrbitOled/OrbitOled.h"
 #include "lib_OrbitOled/OrbitOledChar.h"
 #include "lib_OrbitOled/OrbitOledGrph.h"
 
@@ -46,50 +45,46 @@
 //! ---TODO: Check behaviour of OLEDStringDraw, for unexpected characters.
 //!
 //! If the drawing of the string reaches the right edge of the display, the
-//! characters will be drawn on the next row.  Therefore, special care is 
+//! characters will be drawn on the next row.  Therefore, special care is
 //! required to avoid unintentionally overwriting the display on the next row.
 //!
 //!  Characters are 8 pixels wide (x axis)
-//!		     	and 8 pixels tall (y axis)
+//!             and 8 pixels tall (y axis)
 //!
-//!	 Top left is column 0, row 0.
+//!  Top left is column 0, row 0.
 //!
 //! \return None.
 //
 //*****************************************************************************
-void
-OLEDStringDraw(char *pcStr, uint32_t ulColumn, uint32_t ulRow)
-{
-    //-------Use the Orbit Functions:---------
+void OLEDStringDraw(char *pcStr, uint32_t ulColumn, uint32_t ulRow) {
+    // -------Use the Orbit Functions:---------
 
-	int charX = ulColumn;	//Char index in X axis. (character column)
-	int charY = ulRow;		//Char index in Y axis. (character row)
+    int charX = ulColumn;   // Char index in X axis. (character column)
+    int charY = ulRow;      // Char index in Y axis. (character row)
 
-    //Put the cursor in the right place:
+    // Put the cursor in the right place:
     OrbitOledSetCursor(charX, charY);
 
-    //Print the string:
+    // Print the string:
     OrbitOledPutString(pcStr);
 }
 
 
 /*****************************************************************************
  * OLEDInitialise
- *   	return: 	void
- *   	input: 		void
+ *      return:     void
+ *      input:      void
  *
- *   	purpose:	Runs the required initialiser routines for the OLED display
+ *      purpose:    Runs the required initialiser routines for the OLED display
  *****************************************************************************/
-void
-OLEDInitialise (void){
+void OLEDInitialise(void) {
+    /*
+     * Initialize the OLED
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);    // Need signals on GPIOD
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);    // Need signals on GPIOE
 
-	/*
-	 * Initialize the OLED
-	 */
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);    //Need signals on GPIOD
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);    //Need signals on GPIOE
-
-	OrbitOledInit();
+    OrbitOledInit();
 }
 
 

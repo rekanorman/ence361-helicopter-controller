@@ -72,9 +72,9 @@ static void portBIntHandler(void) {
 
     // Check whether each yaw channel is currently HIGH.
     bool currentChannelA = GPIOPinRead(YAW_GPIO_BASE, YAW_CHANNEL_A_PIN)
-                            == YAW_CHANNEL_A_PIN;
+                           == YAW_CHANNEL_A_PIN;
     bool currentChannelB = GPIOPinRead(YAW_GPIO_BASE, YAW_CHANNEL_B_PIN)
-                            == YAW_CHANNEL_B_PIN;
+                           == YAW_CHANNEL_B_PIN;
 
     // Update the yaw if both channels were previously HIGH.
     if (previousChannelA && previousChannelB) {
