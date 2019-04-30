@@ -60,6 +60,13 @@ void initYaw(void) {
 }
 
 //*****************************************************************************
+// Reset the yaw value to zero.
+//*****************************************************************************
+void yawReset(void) {
+    yawChange = 0;
+}
+
+//*****************************************************************************
 // The interrupt handler for the for pin change interrupt on port B.
 // Compares the current values of the two input yaw channels to their
 // previous values and updates the relative yaw if necessary.

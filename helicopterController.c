@@ -101,6 +101,7 @@ void checkButtons(void) {
     // Recalculate the reference sample value when the LEFT button is pushed.
     if (checkButton(LEFT) == PUSHED) {
         altitudeResetReference();
+        yawReset();
     }
 }
 

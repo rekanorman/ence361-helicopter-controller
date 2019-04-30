@@ -17,7 +17,6 @@
 //*****************************************************************************
 enum displayStates {DISPLAY_ALTITUDE_PERCENT = 0,
                     DISPLAY_MEAN_ADC,
-                    DISPLAY_YAW,
                     DISPLAY_BLANK,
                     NUM_DISPLAY_STATES
                    };
@@ -47,22 +46,24 @@ void initDisplay(void) {
 void displayUpdate(int16_t altitudePercent,
                    uint32_t altitudeMeanADC,
                    int16_t yawDegrees) {
-    char string[MAX_STR_LEN + 1];
+    char line1[MAX_STR_LEN + 1];
+    char line2[MAX_STR_LEN + 1];
 
     if (displayState == DISPLAY_ALTITUDE_PERCENT) {
-        usnprintf(string, sizeof(string), "Altitude: %5d%%", altitudePercent);
+        usnprintf(line1, sizeof(line1), "Altitude: %5d%%", altitudePercent);
+        usnprintf(line2, sizeof(line2), "Yaw: %4d deg   ", yawDegrees);
 
     } else if (displayState == DISPLAY_MEAN_ADC) {
-        usnprintf(string, sizeof(string), "Mean ADC: %4d  ", altitudeMeanADC);
-
-    } else if (displayState == DISPLAY_YAW) {
-        usnprintf(string, sizeof(string), "Yaw: %4d deg   ", yawDegrees);
+        usnprintf(line1, sizeof(line1), "Mean ADC: %4d  ", altitudeMeanADC);
+        usnprintf(line2, sizeof(line2), "                ");
 
     } else {
-        usnprintf(string, sizeof(string), "                ");
+        usnprintf(line1, sizeof(line1), "                ");
+        usnprintf(line2, sizeof(line2), "                ");
     }
 
-    OLEDStringDraw(string, 0, 0);
+    OLEDStringDraw(line1, 0, 0);
+    OLEDStringDraw(line2, 0, 2);
 }
 
 //*****************************************************************************
