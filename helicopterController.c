@@ -18,6 +18,7 @@
 #include "driverlib/debug.h"
 #include "buttons4.h"
 #include "circBufT.h"
+#include "uartUSB.h"
 #include "altitude.h"
 #include "yaw.h"
 #include "display.h"
@@ -117,6 +118,7 @@ int main(void) {
 
     initClock();
     initSysTick();
+    initUart();
     initButtons();
     initDisplay();
     initAltitude();
@@ -138,6 +140,9 @@ int main(void) {
         if (shouldUpdateDisplay) {
             shouldUpdateDisplay = false;
             displayUpdate(altitudePercent(), altitudeMeanADC(), yawDegrees());
+
+            // For now just send UART status whenever we update display.
+            uartSendStatus(altitudePercent(), yawDegrees());
         }
     }
 }
