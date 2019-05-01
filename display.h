@@ -1,5 +1,11 @@
 //*****************************************************************************
 //
+// File: display.h
+//
+// Authors: Reka Norman (rkn24)
+//          Matthew Toohey (mct63)
+//          James Brazier (jbr185)
+//
 // Module for displaying information about the altitude and yaw angle on the
 // OLED display.
 //

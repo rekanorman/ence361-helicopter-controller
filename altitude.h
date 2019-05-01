@@ -1,5 +1,11 @@
 //*****************************************************************************
 //
+// File: altitude.h
+//
+// Authors: Reka Norman (rkn24)
+//          Matthew Toohey (mct63)
+//          James Brazier (jbr185)
+//
 // Module for measuring the altitude by taking regular ADC samples and
 // averaging them.
 //

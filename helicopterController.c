@@ -1,5 +1,11 @@
 //*****************************************************************************
 //
+// File: helicopterController.c
+//
+// Authors: Reka Norman (rkn24)
+//          Matthew Toohey (mct63)
+//          James Brazier (jbr185)
+//
 // Main program for the helicopter controller.
 //
 //*****************************************************************************

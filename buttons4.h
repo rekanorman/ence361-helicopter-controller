@@ -1,18 +1,22 @@
-#ifndef BUTTONS4_H_
-#define BUTTONS4_H_
-
 // *******************************************************
-// buttons4.h
+//
+// File: buttons4.h
+//
+// Authors: Reka Norman (rkn24)
+//          Matthew Toohey (mct63)
+//          James Brazier (jbr185)
+//
+// Attribution: Based on code by P.J. Bones UCECE
 //
 // Support for a set of FOUR specific buttons on the Tiva/Orbit.
-// ENCE361 sample code.
 // The buttons are:  UP and DOWN (on the Orbit daughterboard) plus
 // LEFT and RIGHT on the Tiva.
 //
-// P.J. Bones UCECE
-// Last modified:  7.2.2018
-//
 // *******************************************************
+
+#ifndef BUTTONS4_H_
+#define BUTTONS4_H_
+
 
 #include <stdint.h>
 #include <stdbool.h>

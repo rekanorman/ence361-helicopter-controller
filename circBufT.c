@@ -1,11 +1,15 @@
 // *******************************************************
 //
-// circBufT.c
+// File: circBufT.c
+//
+// Authors: Reka Norman (rkn24)
+//          Matthew Toohey (mct63)
+//          James Brazier (jbr185)
+//
+// Attribution: Based on code by P.J. Bones UCECE
 //
 // Support for a circular buffer of uint32_t values on the
-//  Tiva processor.
-// P.J. Bones UCECE
-// Last modified:  8.3.2017
+// Tiva processor.
 //
 // *******************************************************
 

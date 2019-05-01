@@ -1,5 +1,11 @@
 //*****************************************************************************
 //
+// File: yaw.c
+//
+// Authors: Reka Norman (rkn24)
+//          Matthew Toohey (mct63)
+//          James Brazier (jbr185)
+//
 // Module measuring the yaw angle using pin change interrupts.
 //
 //*****************************************************************************
