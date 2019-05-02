@@ -26,6 +26,8 @@
 #include "driverlib/sysctl.h"
 #include "utils/ustdlib.h"
 #include "uartUSB.h"
+#include "altitude.h"
+#include "yaw.h"
 
 
 //****************************************************************
@@ -53,12 +55,6 @@
 
 
 //*****************************************************************************
-// Static function forward declarations.
-//*****************************************************************************
-static void uartSend(char *string);
-
-
-//*****************************************************************************
 // Initialise the UART module, including the Rx and Tx pins used.
 //*****************************************************************************
 void initUart (void) {
@@ -83,13 +79,13 @@ void initUart (void) {
 //*****************************************************************************
 // Transmits a message containing information about the status of the program.
 //*****************************************************************************
-void uartSendStatus(int16_t altitudePercent, int16_t yawDegrees) {
+void uartSendStatus(void) {
     char status[MAX_STR_LEN + 1];
 
-    usprintf(status, "Alt: %5d%%\r\n", altitudePercent);
+    usprintf(status, "Alt: %5d%%\r\n", altitudePercent());
     uartSend(status);
 
-    usprintf(status, "Yaw: %5d deg\r\n", yawDegrees);
+    usprintf(status, "Yaw: %5d deg\r\n", yawDegrees());
     uartSend(status);
 }
 
@@ -97,7 +93,7 @@ void uartSendStatus(int16_t altitudePercent, int16_t yawDegrees) {
 // Transmit the given string via UART.
 // Uses a blocking function for sending characters.
 //*****************************************************************************
-static void uartSend(char *string) {
+void uartSend(char *string) {
     while(*string) {
         // Write the next character to the UART Tx buffer.
         UARTCharPut(UART_BASE, *string);

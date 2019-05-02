@@ -24,9 +24,7 @@ void initDisplay(void);
 // Displays the appropriate information on the OLED display, based on the
 // current displayState.
 //*****************************************************************************
-void displayUpdate(int16_t altitudePercent,
-                   uint32_t altitudeMeanADC,
-                   int16_t yawChange);
+void displayUpdate(void);
 
 //*****************************************************************************
 // Cycle to the next display state.

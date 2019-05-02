@@ -22,6 +22,7 @@
 #include "altitude.h"
 #include "yaw.h"
 #include "display.h"
+#include "scheduler.h"
 
 
 //*****************************************************************************
@@ -30,16 +31,10 @@
 #define ALTITUDE_SAMPLE_RATE_HZ        400
 #define DISPLAY_UPDATE_RATE_HZ         5
 #define BUTTON_CHECK_RATE_HZ           10
+#define UART_SEND_RATE_HZ              4
 
 // Altitude sampling is the highest frequency task, so use this as SysTick rate.
 #define SYSTICK_RATE_HZ                ALTITUDE_SAMPLE_RATE_HZ
-
-
-//*****************************************************************************
-// Static variables
-//*****************************************************************************
-static bool shouldUpdateDisplay = false;  // When true, update display in main loop.
-static bool shouldCheckButtons = false;    // When true, check buttons in main loop.
 
 
 //*****************************************************************************
@@ -49,24 +44,8 @@ void SysTickIntHandler(void) {
     // Trigger an ADC conversion to measure the current altitude.
     altitudeTriggerConversion();
 
-    // Update the buttons.
     updateButtons();
-
-    // Check if it is time to update the display.
-    const uint16_t ticksPerDisplayUpdate = SYSTICK_RATE_HZ / DISPLAY_UPDATE_RATE_HZ;
-    static uint16_t displayTickCount = 0;
-    if (++displayTickCount >= ticksPerDisplayUpdate) {
-        displayTickCount = 0;
-        shouldUpdateDisplay = true;
-    }
-
-    // Check if it is time to handle button changes.
-    const uint16_t ticksPerButtonCheck = SYSTICK_RATE_HZ / BUTTON_CHECK_RATE_HZ;
-    static uint16_t buttonTickCount = 0;
-    if (++buttonTickCount >= ticksPerButtonCheck) {
-        buttonTickCount = 0;
-        shouldCheckButtons = true;
-    }
+    schedulerUpdateTicks();
 }
 
 //*****************************************************************************
@@ -124,25 +103,22 @@ int main(void) {
     initAltitude();
     initYaw();
 
+    // Initialise the scheduler and register the background tasks with it.
+    initScheduler(3);
+    schedulerRegisterTask(displayUpdate,
+                          SYSTICK_RATE_HZ / DISPLAY_UPDATE_RATE_HZ);
+    schedulerRegisterTask(uartSendStatus,
+                          SYSTICK_RATE_HZ / UART_SEND_RATE_HZ);
+    schedulerRegisterTask(checkButtons,
+                          SYSTICK_RATE_HZ / BUTTON_CHECK_RATE_HZ);
+
     // Enable interrupts to the processor once initialisation is complete.
     IntMasterEnable();
 
     // Set the reference altitude to the current altitude once all other
-    // initialisation is complete.
+    // initialisation is complete (and interrupts are enabled).
     altitudeSetInitialReference();
 
-    while (1) {
-        if (shouldCheckButtons) {
-            shouldCheckButtons = false;
-            checkButtons();
-        }
-
-        if (shouldUpdateDisplay) {
-            shouldUpdateDisplay = false;
-            displayUpdate(altitudePercent(), altitudeMeanADC(), yawDegrees());
-
-            // For now just send UART status whenever we update display.
-            uartSendStatus(altitudePercent(), yawDegrees());
-        }
-    }
+    // Start running the background tasks.
+    schedulerStart();
 }

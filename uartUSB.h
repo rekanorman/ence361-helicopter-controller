@@ -28,7 +28,13 @@ void initUart(void);
 //*****************************************************************************
 // Transmits a message containing information about the status of the program.
 //*****************************************************************************
-void uartSendStatus(int16_t altitudePercent, int16_t yawDegrees);
+void uartSendStatus(void);
+
+//*****************************************************************************
+// Transmit the given string via UART.
+// Uses a blocking function for sending characters.
+//*****************************************************************************
+void uartSend(char *string);
 
 
 #endif /* UARTUSB_H_ */
