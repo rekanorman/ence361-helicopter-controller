@@ -152,17 +152,17 @@ uint32_t calculatePulseWidth(uint32_t dutyCycle, uint32_t period) {
 //
 // power: The power level percentage to set the main rotor to.
 //*****************************************************************************
-void setMainRotorPower(uint16_t power) {
+void setMainRotorPower(int16_t power) {
     if (power > PWM_MAX_DUTY) {
         power = PWM_MAX_DUTY;
     } else if (power < PWM_MIN_DUTY) {
         power = PWM_MIN_DUTY;
     }
-//    uint32_t pulsePeriod = calculatePulsePeriod(PWM_MAIN_ROTOR_FREQUENCY);
-//    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
-//
-//    PWMGenPeriodSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_GEN, pulsePeriod);
-//    PWMPulseWidthSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTNUM, pulseWidth);
+    uint32_t pulsePeriod = calculatePulsePeriod(PWM_MAIN_ROTOR_FREQUENCY);
+    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
+
+    PWMGenPeriodSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_GEN, pulsePeriod);
+    PWMPulseWidthSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTNUM, pulseWidth);
     mainRotorPower = power;
 }
 
@@ -171,17 +171,17 @@ void setMainRotorPower(uint16_t power) {
 //
 // power: The power level percentage to set the tail rotor to.
 //*****************************************************************************
-void setTailRotorPower(uint16_t power) {
+void setTailRotorPower(int16_t power) {
     if (power > PWM_MAX_DUTY) {
         power = PWM_MAX_DUTY;
     } else if (power < PWM_MIN_DUTY) {
         power = PWM_MIN_DUTY;
     }
-//    uint32_t pulsePeriod = calculatePulsePeriod(PWM_TAIL_ROTOR_FREQUENCY);
-//    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
-//
-//    PWMGenPeriodSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_GEN, pulsePeriod);
-//    PWMPulseWidthSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTNUM, pulseWidth);
+    uint32_t pulsePeriod = calculatePulsePeriod(PWM_TAIL_ROTOR_FREQUENCY);
+    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
+
+    PWMGenPeriodSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_GEN, pulsePeriod);
+    PWMPulseWidthSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTNUM, pulseWidth);
     tailRotorPower = power;
 }
 

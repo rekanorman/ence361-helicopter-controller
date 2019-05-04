@@ -43,14 +43,14 @@ void startTailRotor();
 //
 // power: The power level percentage to set the main rotor to.
 //*****************************************************************************
-void setMainRotorPower(uint16_t power);
+void setMainRotorPower(int16_t power);
 
 //*****************************************************************************
 // Sets the power of the tail rotor.
 //
 // power: The power level percentage to set the tail rotor to.
 //*****************************************************************************
-void setTailRotorPower(uint16_t power);
+void setTailRotorPower(int16_t power);
 
 //*****************************************************************************
 // Gets the power of the main rotor.

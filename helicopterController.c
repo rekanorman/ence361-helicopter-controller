@@ -81,25 +81,32 @@ void initSysTick(void) {
 //*****************************************************************************
 void checkButtons(void) {
     // Cycle the display when the RIGHT button is pushed.
+//    if (checkButton(RIGHT) == PUSHED) {
+//        displayStateUpdate();
+//    }
+//
+//    // Recalculate the reference sample value when the LEFT button is pushed.
+//    if (checkButton(LEFT) == PUSHED) {
+//        altitudeResetReference();
+//        yawReset();
+//    }
+
+    //Experimenting with rotors.
     if (checkButton(RIGHT) == PUSHED) {
-        displayStateUpdate();
+        setTailRotorPower(getTailRotorPower()+2);
     }
 
     // Recalculate the reference sample value when the LEFT button is pushed.
     if (checkButton(LEFT) == PUSHED) {
-        altitudeResetReference();
-        yawReset();
+        setTailRotorPower(getTailRotorPower()-2);
     }
 
-    //Experimenting with rotors.
     if (checkButton(UP) == PUSHED) {
         setMainRotorPower(getMainRotorPower()+5);
-        setTailRotorPower(getTailRotorPower()+5);
     }
 
     if (checkButton(DOWN) == PUSHED) {
         setMainRotorPower(getMainRotorPower()-5);
-        setTailRotorPower(getTailRotorPower()-5);
     }
 
 }
@@ -119,8 +126,8 @@ int main(void) {
 
 
     // Testing that rotors actually spin.
-    //startMainRotor();
-    //startTailRotor();
+    startMainRotor();
+    startTailRotor();
 //    setMainRotorPower(20);
 //    setTailRotorPower(20);
 
