@@ -29,14 +29,14 @@ void initialiseMainRotor();
 void initialiseTailRotor();
 
 //*****************************************************************************
-// Enables the main rotor.
+// Starts the main rotor.
 //*****************************************************************************
-void enableMainRotor();
+void startMainRotor();
 
 //*****************************************************************************
-// Enables the tail rotor.
+// Starts the tail rotor.
 //*****************************************************************************
-void enableTailRotor();
+void startTailRotor();
 
 //*****************************************************************************
 // Sets the power of the main rotor.
@@ -51,5 +51,19 @@ void setMainRotorPower(uint16_t power);
 // power: The power level percentage to set the tail rotor to.
 //*****************************************************************************
 void setTailRotorPower(uint16_t power);
+
+//*****************************************************************************
+// Gets the power of the main rotor.
+//
+// returns: The power level percentage of the main rotor.
+//*****************************************************************************
+uint16_t getMainRotorPower();
+
+//*****************************************************************************
+// Gets the power of the tail rotor.
+//
+// returns: The power level percentage of the tail rotor.
+//*****************************************************************************
+uint16_t getTailRotorPower();
 
 #endif  // ROTORS_H_

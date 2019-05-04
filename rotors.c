@@ -56,6 +56,14 @@
 #define PWM_TAIL_ROTOR_GPIO_PIN    GPIO_PIN_1
 
 //*****************************************************************************
+// Static variables
+//*****************************************************************************
+
+// Percentage power of rotors.
+static uint16_t mainRotorPower = 0;
+static uint16_t tailRotorPower = 0;
+
+//*****************************************************************************
 // Performs all initialisation needed for the rotors module.
 //*****************************************************************************
 void initRotors() {
@@ -111,16 +119,16 @@ void initialiseTailRotor() {
 }
 
 //*****************************************************************************
-// Enables the main rotor.
+// Starts the main rotor.
 //*****************************************************************************
-void enableMainRotor() {
+void startMainRotor() {
     PWMOutputState(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTBIT, true);
 }
 
 //*****************************************************************************
-// Enables the tail rotor.
+// Starts the tail rotor.
 //*****************************************************************************
-void enableTailRotor() {
+void startTailRotor() {
     PWMOutputState(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTBIT, true);
 }
 
@@ -163,6 +171,7 @@ void setMainRotorPower(uint16_t power) {
 
     PWMGenPeriodSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_GEN, pulsePeriod);
     PWMPulseWidthSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTNUM, pulseWidth);
+    mainRotorPower = power;
 }
 
 //*****************************************************************************
@@ -181,4 +190,23 @@ void setTailRotorPower(uint16_t power) {
 
     PWMGenPeriodSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_GEN, pulsePeriod);
     PWMPulseWidthSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTNUM, pulseWidth);
+    tailRotorPower = power;
+}
+
+//*****************************************************************************
+// Gets the power of the main rotor.
+//
+// returns: The power level percentage of the main rotor.
+//*****************************************************************************
+uint16_t getMainRotorPower() {
+    return mainRotorPower;
+}
+
+//*****************************************************************************
+// Gets the power of the tail rotor.
+//
+// returns: The power level percentage of the tail rotor.
+//*****************************************************************************
+uint16_t getTailRotorPower() {
+    return tailRotorPower;
 }

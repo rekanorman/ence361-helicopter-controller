@@ -28,6 +28,7 @@
 #include "uartUSB.h"
 #include "altitude.h"
 #include "yaw.h"
+#include "rotors.h"
 
 
 //****************************************************************
@@ -86,6 +87,9 @@ void uartSendStatus(void) {
     uartSend(status);
 
     usprintf(status, "Yaw: %5d deg\r\n", yawDegrees());
+    uartSend(status);
+
+    usprintf(status, "Main: %5d%% Tail: %5d%%\r\n", getMainRotorPower(), getTailRotorPower());
     uartSend(status);
 }
 
