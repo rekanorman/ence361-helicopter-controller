@@ -76,10 +76,6 @@ void initRotors() {
 // Performs initialisation for the main rotor.
 //*****************************************************************************
 void initialiseMainRotor() {
-    // Reset the main rotors peripherals as a precaution.
-    SysCtlPeripheralReset(PWM_MAIN_ROTOR_PERIPH_GPIO);
-    SysCtlPeripheralReset(PWM_MAIN_ROTOR_PERIPH_PWM);
-
     SysCtlPeripheralEnable(PWM_MAIN_ROTOR_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_MAIN_ROTOR_PERIPH_GPIO);
 
@@ -99,10 +95,6 @@ void initialiseMainRotor() {
 // Performs initialisation for the tail rotor.
 //*****************************************************************************
 void initialiseTailRotor() {
-    // Reset the tail rotors peripherals as a precaution.
-    SysCtlPeripheralReset(PWM_TAIL_ROTOR_PERIPH_GPIO);
-    SysCtlPeripheralReset(PWM_TAIL_ROTOR_PERIPH_PWM);
-
     SysCtlPeripheralEnable(PWM_TAIL_ROTOR_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_TAIL_ROTOR_PERIPH_GPIO);
 
@@ -166,11 +158,11 @@ void setMainRotorPower(uint16_t power) {
     } else if (power < PWM_MIN_DUTY) {
         power = PWM_MIN_DUTY;
     }
-    uint32_t pulsePeriod = calculatePulsePeriod(PWM_MAIN_ROTOR_FREQUENCY);
-    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
-
-    PWMGenPeriodSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_GEN, pulsePeriod);
-    PWMPulseWidthSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTNUM, pulseWidth);
+//    uint32_t pulsePeriod = calculatePulsePeriod(PWM_MAIN_ROTOR_FREQUENCY);
+//    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
+//
+//    PWMGenPeriodSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_GEN, pulsePeriod);
+//    PWMPulseWidthSet(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTNUM, pulseWidth);
     mainRotorPower = power;
 }
 
@@ -185,11 +177,11 @@ void setTailRotorPower(uint16_t power) {
     } else if (power < PWM_MIN_DUTY) {
         power = PWM_MIN_DUTY;
     }
-    uint32_t pulsePeriod = calculatePulsePeriod(PWM_TAIL_ROTOR_FREQUENCY);
-    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
-
-    PWMGenPeriodSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_GEN, pulsePeriod);
-    PWMPulseWidthSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTNUM, pulseWidth);
+//    uint32_t pulsePeriod = calculatePulsePeriod(PWM_TAIL_ROTOR_FREQUENCY);
+//    uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
+//
+//    PWMGenPeriodSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_GEN, pulsePeriod);
+//    PWMPulseWidthSet(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTNUM, pulseWidth);
     tailRotorPower = power;
 }
 

@@ -80,7 +80,7 @@ void initSysTick(void) {
 // Note: buttons are updated regularly in the SysTickIntHandler.
 //*****************************************************************************
 void checkButtons(void) {
-    // Cycle the display when the UP button is pushed.
+    // Cycle the display when the RIGHT button is pushed.
     if (checkButton(RIGHT) == PUSHED) {
         displayStateUpdate();
     }
@@ -91,7 +91,7 @@ void checkButtons(void) {
         yawReset();
     }
 
-    // Experimenting with rotors.
+    //Experimenting with rotors.
     if (checkButton(UP) == PUSHED) {
         setMainRotorPower(getMainRotorPower()+5);
         setTailRotorPower(getTailRotorPower()+5);
@@ -119,8 +119,8 @@ int main(void) {
 
 
     // Testing that rotors actually spin.
-    startMainRotor();
-    startTailRotor();
+    //startMainRotor();
+    //startTailRotor();
 //    setMainRotorPower(20);
 //    setTailRotorPower(20);
 
