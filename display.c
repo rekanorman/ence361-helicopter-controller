@@ -16,6 +16,8 @@
 #include "utils/ustdlib.h"
 #include "OrbitOLED/OrbitOLEDInterface.h"
 #include "display.h"
+#include "altitude.h"
+#include "yaw.h"
 
 
 //*****************************************************************************
@@ -49,18 +51,16 @@ void initDisplay(void) {
 // Displays the appropriate information on the OLED display, based on the
 // current displayState.
 //*****************************************************************************
-void displayUpdate(int16_t altitudePercent,
-                   uint32_t altitudeMeanADC,
-                   int16_t yawDegrees) {
+void displayUpdate(void) {
     char line1[MAX_STR_LEN + 1];
     char line2[MAX_STR_LEN + 1];
 
     if (displayState == DISPLAY_ALTITUDE_PERCENT) {
-        usnprintf(line1, sizeof(line1), "Altitude: %5d%%", altitudePercent);
-        usnprintf(line2, sizeof(line2), "Yaw: %4d deg   ", yawDegrees);
+        usnprintf(line1, sizeof(line1), "Altitude: %5d%%", altitudePercent());
+        usnprintf(line2, sizeof(line2), "Yaw: %4d deg   ", yawDegrees());
 
     } else if (displayState == DISPLAY_MEAN_ADC) {
-        usnprintf(line1, sizeof(line1), "Mean ADC: %4d  ", altitudeMeanADC);
+        usnprintf(line1, sizeof(line1), "Mean ADC: %4d  ", altitudeMeanADC());
         usnprintf(line2, sizeof(line2), "                ");
 
     } else {
