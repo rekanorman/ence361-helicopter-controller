@@ -23,6 +23,7 @@
 #include "yaw.h"
 #include "display.h"
 #include "scheduler.h"
+#include "rotors.h"
 
 
 //*****************************************************************************
@@ -102,6 +103,14 @@ int main(void) {
     initDisplay();
     initAltitude();
     initYaw();
+    initRotors();
+
+
+// Testing that rotors actually spin.
+//    enableMainRotor();
+//    enableTailRotor();
+//    setMainRotorPower(20);
+//    setTailRotorPower(20);
 
     // Initialise the scheduler and register the background tasks with it.
     initScheduler(3);
