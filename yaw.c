@@ -28,7 +28,7 @@
 #define YAW_CHANNEL_B_PIN       GPIO_PIN_1
 #define YAW_INTERRUPT_TRIGGER   GPIO_BOTH_EDGES   // Detect rising and falling edges
 
-#define NUM_SLOTS_IN_CIRCLE     112
+#define NUM_SLOTS_IN_CIRCLE     448
 #define NUM_DEGREES_IN_CIRCLE   360
 
 
@@ -85,14 +85,29 @@ static void portBIntHandler(void) {
     bool currentChannelB = GPIOPinRead(YAW_GPIO_BASE, YAW_CHANNEL_B_PIN)
                            == YAW_CHANNEL_B_PIN;
 
-    // Update the yaw if both channels were previously HIGH.
-    if (previousChannelA && previousChannelB) {
-        if (currentChannelA && !currentChannelB) {
-            // Clockwise rotation
-            yawChange += 1;
-        } else if (currentChannelB && !currentChannelA) {
-            // Anticlockwise rotation
+    if (!previousChannelA &&  !previousChannelB) {
+        if (!currentChannelA && currentChannelB) {
             yawChange -= 1;
+        } else if (currentChannelA && !currentChannelB) {
+            yawChange += 1;
+        }
+    } else if (!previousChannelA && previousChannelB) {
+        if (currentChannelA && currentChannelB) {
+            yawChange -= 1;
+        } else if (!currentChannelA && !currentChannelB) {
+            yawChange += 1;
+        }
+    } else if (previousChannelA && !previousChannelB) {
+        if (!currentChannelA && !currentChannelB) {
+            yawChange -= 1;
+        } else if (currentChannelA && currentChannelB) {
+            yawChange += 1;
+        }
+    } else {
+        if (currentChannelA && !currentChannelB) {
+            yawChange -= 1;
+        } else if (!currentChannelA && currentChannelB) {
+            yawChange += 1;
         }
     }
 
@@ -121,6 +136,7 @@ int16_t yawDegrees(void) {
 //        degrees -= NUM_DEGREES_IN_CIRCLE;
 //    }
     return degrees;
+    return yawChange;
 }
 
 //*****************************************************************************
