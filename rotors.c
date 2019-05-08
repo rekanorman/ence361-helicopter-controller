@@ -13,23 +13,22 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pwm.h"
-#include "driverlib/systick.h"
 #include "driverlib/sysctl.h"
 
 #include "rotors.h"
+
 
 //*****************************************************************************
 // Constants
 //*****************************************************************************
 
-#define PWM_DIVIDER_CODE SYSCTL_PWMDIV_4
-#define PWM_DIVIDER 4
-#define PWM_MAX_DUTY 98
-#define PWM_MIN_DUTY 2
+#define PWM_DIVIDER_CODE    SYSCTL_PWMDIV_4
+#define PWM_DIVIDER         4
+#define PWM_MAX_DUTY        95
+#define PWM_MIN_DUTY        5
 
 // Main rotor.
 #define PWM_MAIN_ROTOR_FREQUENCY   250
@@ -55,6 +54,7 @@
 #define PWM_TAIL_ROTOR_GPIO_CONFIG GPIO_PF1_M1PWM5
 #define PWM_TAIL_ROTOR_GPIO_PIN    GPIO_PIN_1
 
+
 //*****************************************************************************
 // Static variables
 //*****************************************************************************
@@ -62,6 +62,16 @@
 // Percentage power of rotors.
 static uint16_t mainRotorPower = 0;
 static uint16_t tailRotorPower = 0;
+
+
+//*****************************************************************************
+// Static function forward declarations
+//*****************************************************************************
+static void initialiseMainRotor();
+static void initialiseTailRotor();
+static uint32_t calculatePulsePeriod(uint32_t frequency);
+static uint32_t calculatePulseWidth(uint32_t dutyCycle, uint32_t period);
+
 
 //*****************************************************************************
 // Performs all initialisation needed for the rotors module.
@@ -75,15 +85,16 @@ void initRotors() {
 //*****************************************************************************
 // Performs initialisation for the main rotor.
 //*****************************************************************************
-void initialiseMainRotor() {
+static void initialiseMainRotor() {
     SysCtlPeripheralEnable(PWM_MAIN_ROTOR_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_MAIN_ROTOR_PERIPH_GPIO);
 
     GPIOPinConfigure(PWM_MAIN_ROTOR_GPIO_CONFIG);
     GPIOPinTypePWM(PWM_MAIN_ROTOR_GPIO_BASE, PWM_MAIN_ROTOR_GPIO_PIN);
 
-    PWMGenConfigure(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_GEN,
-                        PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+    PWMGenConfigure(PWM_MAIN_ROTOR_BASE,
+                    PWM_MAIN_ROTOR_GEN,
+                    PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
     PWMGenEnable(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_GEN);
 
@@ -94,7 +105,7 @@ void initialiseMainRotor() {
 //*****************************************************************************
 // Performs initialisation for the tail rotor.
 //*****************************************************************************
-void initialiseTailRotor() {
+static void initialiseTailRotor() {
     SysCtlPeripheralEnable(PWM_TAIL_ROTOR_PERIPH_PWM);
     SysCtlPeripheralEnable(PWM_TAIL_ROTOR_PERIPH_GPIO);
 
@@ -111,17 +122,19 @@ void initialiseTailRotor() {
 }
 
 //*****************************************************************************
-// Starts the main rotor.
+// Starts the main rotor, setting the duty cycle to the minimum value.
 //*****************************************************************************
 void startMainRotor() {
     PWMOutputState(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTBIT, true);
+    setMainRotorPower(PWM_MIN_DUTY);
 }
 
 //*****************************************************************************
-// Starts the tail rotor.
+// Starts the tail rotor, setting the duty cycle to the minimum value.
 //*****************************************************************************
 void startTailRotor() {
     PWMOutputState(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTBIT, true);
+    setTailRotorPower(PWM_MIN_DUTY);
 }
 
 //*****************************************************************************
@@ -131,7 +144,7 @@ void startTailRotor() {
 // frequency: The frequency in Hz.
 // returns:   The period in number of clock ticks.
 //*****************************************************************************
-uint32_t calculatePulsePeriod(uint32_t frequency) {
+static uint32_t calculatePulsePeriod(uint32_t frequency) {
     return SysCtlClockGet() / PWM_DIVIDER / frequency;
 }
 
@@ -143,7 +156,7 @@ uint32_t calculatePulsePeriod(uint32_t frequency) {
 // period:    The period of the PWM signal in number of clock ticks.
 // returns:   The width of the PWM pulse in number of PWM clock ticks.
 //*****************************************************************************
-uint32_t calculatePulseWidth(uint32_t dutyCycle, uint32_t period) {
+static uint32_t calculatePulseWidth(uint32_t dutyCycle, uint32_t period) {
     return period * dutyCycle / 100;
 }
 

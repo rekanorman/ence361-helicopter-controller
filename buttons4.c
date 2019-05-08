@@ -21,7 +21,8 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/debug.h"
-#include "inc/tm4c123gh6pm.h"  // Board specific defines (for PF0)
+#include "inc/tm4c123gh6pm.h"
+
 #include "buttons4.h"
 
 

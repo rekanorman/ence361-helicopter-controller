@@ -25,10 +25,11 @@
 #include "driverlib/uart.h"
 #include "driverlib/sysctl.h"
 #include "utils/ustdlib.h"
-#include "uartUSB.h"
 #include "altitude.h"
 #include "yaw.h"
 #include "rotors.h"
+
+#include "uartUSB.h"
 
 
 //****************************************************************
@@ -83,13 +84,16 @@ void initUart (void) {
 void uartSendStatus(void) {
     char status[MAX_STR_LEN + 1];
 
-    usprintf(status, "Alt: %5d%%\r\n", altitudePercent());
+    usprintf(status, "Alt: %4d [%4d]\r\n", altitudePercent(), altitudeDesired());
     uartSend(status);
 
-    usprintf(status, "Yaw: %5d deg\r\n", yawDegrees());
+    usprintf(status, "Yaw: %4d [%4d]\r\n", yawDegrees(), yawDesired());
     uartSend(status);
 
-    usprintf(status, "Main: %5d%% Tail: %5d%%\r\n", getMainRotorPower(), getTailRotorPower());
+    usprintf(status, "Main: %5d%%  \r\n", getMainRotorPower());
+    uartSend(status);
+
+    usprintf(status, "Tail: %5d%%  \r\n", getTailRotorPower());
     uartSend(status);
 }
 

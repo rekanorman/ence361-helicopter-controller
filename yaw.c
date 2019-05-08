@@ -15,6 +15,7 @@
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
+
 #include "yaw.h"
 
 
@@ -38,6 +39,8 @@
 // Yaw value relative to the position when the program started, measured
 // in the number of slots passed.
 static int16_t yawChange = 0;
+
+static int16_t desiredYaw = 0;
 
 
 //*****************************************************************************
@@ -63,13 +66,6 @@ void initYaw(void) {
                    YAW_INTERRUPT_TRIGGER);
 
     GPIOIntEnable(YAW_GPIO_BASE, YAW_CHANNEL_A_PIN | YAW_CHANNEL_B_PIN);
-}
-
-//*****************************************************************************
-// Reset the yaw value to zero.
-//*****************************************************************************
-void yawReset(void) {
-    yawChange = 0;
 }
 
 //*****************************************************************************
@@ -116,12 +112,36 @@ int16_t yawDegrees(void) {
     // Find remainder when divided by the number of degrees in a circle.
     degrees = degrees % NUM_DEGREES_IN_CIRCLE;
 
+    // Don't limit yaw range for now, to simplify control.
+
     // Ensure the returned value is between -180 and 179.
-    if (degrees < -NUM_DEGREES_IN_CIRCLE / 2) {
-        degrees += NUM_DEGREES_IN_CIRCLE;
-    } else if (degrees >= NUM_DEGREES_IN_CIRCLE / 2) {
-        degrees -= NUM_DEGREES_IN_CIRCLE;
-    }
+//    if (degrees < -NUM_DEGREES_IN_CIRCLE / 2) {
+//        degrees += NUM_DEGREES_IN_CIRCLE;
+//    } else if (degrees >= NUM_DEGREES_IN_CIRCLE / 2) {
+//        degrees -= NUM_DEGREES_IN_CIRCLE;
+//    }
     return degrees;
+}
+
+//*****************************************************************************
+// Adds the given amount to the desired yaw.
+//*****************************************************************************
+void yawChangeDesired(int16_t amount) {
+    desiredYaw += amount;
+}
+
+//*****************************************************************************
+// Returns the desired yaw in degrees.
+//*****************************************************************************
+int16_t yawDesired(void) {
+    return desiredYaw;
+}
+
+//*****************************************************************************
+// Calculates and returns the difference between the desired yaw and the
+// actual yaw, in degrees.
+//*****************************************************************************
+int16_t yawError(void) {
+    return desiredYaw - yawDegrees();
 }
 

@@ -24,18 +24,23 @@
 #include "display.h"
 #include "scheduler.h"
 #include "rotors.h"
+#include "control.h"
 
 
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define ALTITUDE_SAMPLE_RATE_HZ        400
+#define ALTITUDE_SAMPLE_RATE_HZ        100
+#define CONTROL_UPDATE_RATE_HZ         20
 #define DISPLAY_UPDATE_RATE_HZ         5
 #define BUTTON_CHECK_RATE_HZ           10
 #define UART_SEND_RATE_HZ              4
 
 // Altitude sampling is the highest frequency task, so use this as SysTick rate.
 #define SYSTICK_RATE_HZ                ALTITUDE_SAMPLE_RATE_HZ
+
+#define ALTITUDE_STEP_PERCENT    10
+#define YAW_STEP_DEGREES         15
 
 
 //*****************************************************************************
@@ -93,20 +98,19 @@ void checkButtons(void) {
 
     //Experimenting with rotors.
     if (checkButton(RIGHT) == PUSHED) {
-        setTailRotorPower(getTailRotorPower()+2);
+        yawChangeDesired(YAW_STEP_DEGREES);
     }
 
-    // Recalculate the reference sample value when the LEFT button is pushed.
     if (checkButton(LEFT) == PUSHED) {
-        setTailRotorPower(getTailRotorPower()-2);
+        yawChangeDesired(-YAW_STEP_DEGREES);
     }
 
     if (checkButton(UP) == PUSHED) {
-        setMainRotorPower(getMainRotorPower()+5);
+        setMainRotorPower(getMainRotorPower() + 5);
     }
 
     if (checkButton(DOWN) == PUSHED) {
-        setMainRotorPower(getMainRotorPower()-5);
+        setMainRotorPower(getMainRotorPower() - 5);
     }
 
 }
@@ -123,16 +127,13 @@ int main(void) {
     initAltitude();
     initYaw();
     initRotors();
-
-
-    // Testing that rotors actually spin.
-    startMainRotor();
-    startTailRotor();
-//    setMainRotorPower(20);
-//    setTailRotorPower(20);
+    initControl(CONTROL_UPDATE_RATE_HZ);
 
     // Initialise the scheduler and register the background tasks with it.
-    initScheduler(3);
+    initScheduler(4);    // Recalculate the reference sample value when the LEFT button is pushed.
+
+    schedulerRegisterTask(controlUpdateYaw,
+                          SYSTICK_RATE_HZ / CONTROL_UPDATE_RATE_HZ);
     schedulerRegisterTask(displayUpdate,
                           SYSTICK_RATE_HZ / DISPLAY_UPDATE_RATE_HZ);
     schedulerRegisterTask(uartSendStatus,
@@ -146,6 +147,10 @@ int main(void) {
     // Set the reference altitude to the current altitude once all other
     // initialisation is complete (and interrupts are enabled).
     altitudeSetInitialReference();
+
+    // Start the rotors, setting their duty cycles to the minimum value.
+    startMainRotor();
+    startTailRotor();
 
     // Start running the background tasks.
     schedulerStart();

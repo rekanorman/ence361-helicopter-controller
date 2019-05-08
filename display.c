@@ -15,9 +15,10 @@
 #include <stdbool.h>
 #include "utils/ustdlib.h"
 #include "OrbitOLED/OrbitOLEDInterface.h"
-#include "display.h"
 #include "altitude.h"
 #include "yaw.h"
+
+#include "display.h"
 
 
 //*****************************************************************************

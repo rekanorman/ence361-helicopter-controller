@@ -13,28 +13,19 @@
 #ifndef ROTORS_H_
 #define ROTORS_H_
 
+
 //*****************************************************************************
 // Performs all initialisation needed for the rotors module.
 //*****************************************************************************
 void initRotors();
 
 //*****************************************************************************
-// Performs initialisation for the main rotor.
-//*****************************************************************************
-void initialiseMainRotor();
-
-//*****************************************************************************
-// Performs initialisation for the tail rotor.
-//*****************************************************************************
-void initialiseTailRotor();
-
-//*****************************************************************************
-// Starts the main rotor.
+// Starts the main rotor, setting the duty cycle to the minimum value.
 //*****************************************************************************
 void startMainRotor();
 
 //*****************************************************************************
-// Starts the tail rotor.
+// Starts the tail rotor, setting the duty cycle to the minimum value.
 //*****************************************************************************
 void startTailRotor();
 

@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+
 #include "scheduler.h"
 
 
@@ -33,8 +34,8 @@ typedef struct {
 //*****************************************************************************
 // Static variables
 //*****************************************************************************
-task_t* tasks;
-uint16_t numTasks;
+static task_t* tasks;
+static uint16_t numTasks;
 
 
 //*****************************************************************************

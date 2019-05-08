@@ -17,6 +17,7 @@
 #include "driverlib/adc.h"
 #include "driverlib/sysctl.h"
 #include "circBufT.h"
+
 #include "altitude.h"
 
 
@@ -53,9 +54,11 @@ static circBuf_t inBuffer;
 // Number of ADC samples taken, used to check whether buffer is filled yet.
 static uint32_t numSamplesTaken = 0;
 
-static int32_t meanADC;       // Current mean ADC value.
+static int16_t meanADC;       // Current mean ADC value.
 static int32_t sumADC;        // Current sum of the ADC samples in the buffer.
-static int32_t referenceADC;  // ADC value corresponding to 'landed' altitude.
+static int16_t referenceADC;  // ADC value corresponding to 'landed' altitude.
+
+static int16_t desiredAltitude = 0;
 
 
 //*****************************************************************************
@@ -119,13 +122,6 @@ void altitudeSetInitialReference(void) {
 }
 
 //*****************************************************************************
-// Set the reference ADC value to the current mean ADC value.
-//*****************************************************************************
-void altitudeResetReference(void) {
-    referenceADC = meanADC;
-}
-
-//*****************************************************************************
 // Triggers a conversion on the ADC sequence being used to measure the
 // altitude. Should be called at a rate equal to the desired sampling rate.
 //*****************************************************************************
@@ -162,17 +158,30 @@ static void altitudeADCIntHandler(void) {
 //*****************************************************************************
 // Returns the mean of the ADC samples currently in the buffer.
 //*****************************************************************************
-uint32_t altitudeMeanADC(void) {
+int16_t altitudeMeanADC(void) {
     return meanADC;
 }
 
 //*****************************************************************************
 // Calculates and returns the current percentage altitude, based on the mean
 // sample value and relative to the global referenceSample, which represents
-// the landed altitude. Percentage can be positive or negative
-// TODO(everyone): If this is needed for the control, it should be calculated every time
-//       a sample is taken, but for now it's just being used for display.
+// the landed altitude. Percentage can be positive or negative.
 //*****************************************************************************
 int16_t altitudePercent(void) {
     return (referenceADC - meanADC) * 100 / ADC_RANGE;
+}
+
+//*****************************************************************************
+// Returns the desired percentage altitude.
+//*****************************************************************************
+int16_t altitudeDesired(void) {
+    return desiredAltitude;
+}
+
+//*****************************************************************************
+// Calculates and returns the difference between the desired altitude and
+// the current altitude, as a percent.
+//*****************************************************************************
+int16_t altitudeError(void) {
+    return desiredAltitude - altitudePercent();
 }
