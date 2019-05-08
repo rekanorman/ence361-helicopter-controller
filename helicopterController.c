@@ -85,17 +85,6 @@ void initSysTick(void) {
 // Note: buttons are updated regularly in the SysTickIntHandler.
 //*****************************************************************************
 void checkButtons(void) {
-    // Cycle the display when the RIGHT button is pushed.
-//    if (checkButton(RIGHT) == PUSHED) {
-//        displayStateUpdate();
-//    }
-//
-//    // Recalculate the reference sample value when the LEFT button is pushed.
-//    if (checkButton(LEFT) == PUSHED) {
-//        altitudeResetReference();
-//        yawReset();
-//    }
-
     //Experimenting with rotors.
     if (checkButton(RIGHT) == PUSHED) {
         yawChangeDesired(YAW_STEP_DEGREES);
@@ -130,7 +119,7 @@ int main(void) {
     initControl(CONTROL_UPDATE_RATE_HZ);
 
     // Initialise the scheduler and register the background tasks with it.
-    initScheduler(4);    // Recalculate the reference sample value when the LEFT button is pushed.
+    initScheduler(4);
 
     schedulerRegisterTask(controlUpdateYaw,
                           SYSTICK_RATE_HZ / CONTROL_UPDATE_RATE_HZ);

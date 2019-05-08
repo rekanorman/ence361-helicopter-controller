@@ -87,27 +87,27 @@ static void portBIntHandler(void) {
 
     if (!previousChannelA &&  !previousChannelB) {
         if (!currentChannelA && currentChannelB) {
-            yawChange -= 1;
-        } else if (currentChannelA && !currentChannelB) {
             yawChange += 1;
+        } else if (currentChannelA && !currentChannelB) {
+            yawChange -= 1;
         }
     } else if (!previousChannelA && previousChannelB) {
         if (currentChannelA && currentChannelB) {
-            yawChange -= 1;
-        } else if (!currentChannelA && !currentChannelB) {
             yawChange += 1;
+        } else if (!currentChannelA && !currentChannelB) {
+            yawChange -= 1;
         }
     } else if (previousChannelA && !previousChannelB) {
         if (!currentChannelA && !currentChannelB) {
-            yawChange -= 1;
-        } else if (currentChannelA && currentChannelB) {
             yawChange += 1;
+        } else if (currentChannelA && currentChannelB) {
+            yawChange -= 1;
         }
     } else {
         if (currentChannelA && !currentChannelB) {
-            yawChange -= 1;
-        } else if (!currentChannelA && currentChannelB) {
             yawChange += 1;
+        } else if (!currentChannelA && currentChannelB) {
+            yawChange -= 1;
         }
     }
 
@@ -125,7 +125,7 @@ int16_t yawDegrees(void) {
     // Convert yawChange to degrees.
     int16_t degrees = yawChange * NUM_DEGREES_IN_CIRCLE / NUM_SLOTS_IN_CIRCLE;
     // Find remainder when divided by the number of degrees in a circle.
-    degrees = degrees % NUM_DEGREES_IN_CIRCLE;
+//    degrees = degrees % NUM_DEGREES_IN_CIRCLE;
 
     // Don't limit yaw range for now, to simplify control.
 
@@ -136,7 +136,6 @@ int16_t yawDegrees(void) {
 //        degrees -= NUM_DEGREES_IN_CIRCLE;
 //    }
     return degrees;
-    return yawChange;
 }
 
 //*****************************************************************************
