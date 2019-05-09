@@ -137,10 +137,10 @@ static void altitudeADCIntHandler(void) {
     numSamplesTaken++;
 
     // Get the oldest value from the circular buffer (before it is overwritten).
-    oldestValue = readEarliestValueCircBuf(&inBuffer);
+    oldestValue = circBufRead(&inBuffer);
 
     // Write the new value to the circular buffer.
-    writeCircBuf(&inBuffer, newValue);
+    circBufWrite(&inBuffer, newValue);
 
     // Adjust the current sum and calculate new mean ADC.
     sumADC = sumADC - oldestValue + newValue;

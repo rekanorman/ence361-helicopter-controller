@@ -1,4 +1,4 @@
-// *******************************************************
+// ****************************************************************************
 //
 // File: circBufT.c
 //
@@ -6,73 +6,59 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Attribution: Based on code by P.J. Bones UCECE
+// Attribution: Based on circBufT.c, written by P.J. Bones UCECE.
 //
-// Support for a circular buffer of uint32_t values on the
-// Tiva processor.
+// A variation of a circular buffer using a single read/write index, which
+// provides the following operations:
+// - writing to the buffer
+// - reading the oldest value in the buffer (the value which will next be
+//   overwritten).
 //
-// *******************************************************
+// ****************************************************************************
 
 #include <stdint.h>
 #include "stdlib.h"
 
 #include "circBufT.h"
 
-// *******************************************************
-// initCircBuf: Initialise the circBuf instance. Reset both indices to
-// the start of the buffer.  Dynamically allocate and clear the the
-// memory and return a pointer for the data.  Return NULL if
-// allocation fails.
+// ****************************************************************************
+// Initialise the circBuf instance, setting index to the start of the buffer.
+// Dynamically allocate and clear the the memory and return a pointer to
+// the data.  Return NULL if allocation fails.
+// ****************************************************************************
 uint32_t *initCircBuf(circBuf_t *buffer, uint32_t size) {
-    buffer->windex = 0;
-    buffer->rindex = 0;
+    buffer->index = 0;
     buffer->size = size;
-    buffer->data =
-        (uint32_t *) calloc(size, sizeof(uint32_t));
+    buffer->data = (uint32_t *) calloc(size, sizeof(uint32_t));
     return buffer->data;
 }
-// Note use of calloc() to clear contents.
 
-// *******************************************************
-// writeCircBuf: insert entry at the current windex location,
-// advance windex, modulo (buffer size).
-void writeCircBuf(circBuf_t *buffer, uint32_t entry) {
-    buffer->data[buffer->windex] = entry;
-    buffer->windex++;
-    if (buffer->windex >= buffer->size) {
-        buffer->windex = 0;
+// ****************************************************************************
+// Insert the given entry at the current index location, advancing the index
+// modulo (buffer size).
+// ****************************************************************************
+void circBufWrite(circBuf_t *buffer, uint32_t entry) {
+    buffer->data[buffer->index] = entry;
+    buffer->index++;
+    if (buffer->index >= buffer->size) {
+        buffer->index = 0;
     }
 }
 
-// *******************************************************
-// readCircBuf: return entry at the current rindex location,
-// advance rindex, modulo (buffer size). The function deos not check
-// if reading has advanced ahead of writing.
-uint32_t readCircBuf(circBuf_t *buffer) {
-    uint32_t entry;
-
-    entry = buffer->data[buffer->rindex];
-    buffer->rindex++;
-    if (buffer->rindex >= buffer->size) {
-        buffer->rindex = 0;
-    }
-    return entry;
+// ****************************************************************************
+// Read the oldest value in the buffer (the value which will next be
+// overwritten).
+// ****************************************************************************
+uint32_t circBufRead(circBuf_t *buffer) {
+    return buffer->data[buffer->index];
 }
 
-// *******************************************************
-// Read the oldest value in the buffer, that is, the next value
-// to be overwritten.
-uint32_t readEarliestValueCircBuf(circBuf_t *buffer) {
-    return buffer->data[buffer->windex];
-}
-
-// *******************************************************
-// freeCircBuf: Releases the memory allocated to the buffer data,
-// sets pointer to NULL and ohter fields to 0. The buffer can
-// re-initialised by another call to initCircBuf().
-void freeCircBuf(circBuf_t * buffer) {
-    buffer->windex = 0;
-    buffer->rindex = 0;
+// ****************************************************************************
+// Releases the memory allocated to the buffer data, setting the pointer
+// to NULL and other fields to 0.
+// ****************************************************************************
+void circBufFree(circBuf_t * buffer) {
+    buffer->index = 0;
     buffer->size = 0;
     free(buffer->data);
     buffer->data = NULL;
