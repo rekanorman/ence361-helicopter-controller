@@ -24,20 +24,8 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-enum displayStates {DISPLAY_ALTITUDE_PERCENT = 0,
-                    DISPLAY_MEAN_ADC,
-                    DISPLAY_BLANK,
-                    NUM_DISPLAY_STATES
-                   };
-
 // Maximum string length which can be displayed on the OLED display.
 #define MAX_STR_LEN     16
-
-
-//*****************************************************************************
-// Static variables
-//*****************************************************************************
-static uint8_t displayState = DISPLAY_ALTITUDE_PERCENT;
 
 
 //*****************************************************************************
@@ -49,33 +37,20 @@ void initDisplay(void) {
 }
 
 //*****************************************************************************
-// Displays the appropriate information on the OLED display, based on the
-// current displayState.
+// Displays the appropriate information on the OLED display.
 //*****************************************************************************
 void displayUpdate(void) {
-    char line1[MAX_STR_LEN + 1];
-    char line2[MAX_STR_LEN + 1];
+    char line[MAX_STR_LEN + 1];
 
-    if (displayState == DISPLAY_ALTITUDE_PERCENT) {
-        usnprintf(line1, sizeof(line1), "Altitude: %5d%%", altitudePercent());
-        usnprintf(line2, sizeof(line2), "Yaw: %4d deg   ", yawDegrees());
+    usnprintf(line, sizeof(line), "Alt: %5d%%     ", altitudePercent());
+    OLEDStringDraw(line, 0, 0);
 
-    } else if (displayState == DISPLAY_MEAN_ADC) {
-        usnprintf(line1, sizeof(line1), "Mean ADC: %4d  ", altitudeMeanADC());
-        usnprintf(line2, sizeof(line2), "                ");
+    usnprintf(line, sizeof(line), "Yaw: %5d deg  ", yawDegrees());
+    OLEDStringDraw(line, 0, 1);
 
-    } else {
-        usnprintf(line1, sizeof(line1), "                ");
-        usnprintf(line2, sizeof(line2), "                ");
-    }
+    usnprintf(line, sizeof(line), "Main: %4d%%     ", yawDegrees());
+    OLEDStringDraw(line, 0, 2);
 
-    OLEDStringDraw(line1, 0, 0);
-    OLEDStringDraw(line2, 0, 2);
-}
-
-//*****************************************************************************
-// Cycle to the next display state.
-//*****************************************************************************
-void displayStateUpdate(void) {
-    displayState = (displayState + 1) % NUM_DISPLAY_STATES;
+    usnprintf(line, sizeof(line), "Tail: %4d%%     ", yawDegrees());
+    OLEDStringDraw(line, 0, 3);
 }

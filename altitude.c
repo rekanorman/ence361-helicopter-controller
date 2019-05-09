@@ -24,39 +24,34 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define BUF_SIZE                40
+#define BUF_SIZE                20
+
+#define MIN_ALTITUDE            0
+#define MAX_ALTITUDE            100
 
 // The range over which the ADC sample values vary, from landed to fully up.
 // Calculated as: 4095 * (0.8V / 3.3V)
 #define ADC_RANGE               993
 
-//*****************************************************************************
-// Constants related to ADC.
-//*****************************************************************************
+// Constants related to ADC peripheral.
 #define ALTITUDE_ADC_PERIPH             SYSCTL_PERIPH_ADC0
 #define ALTITUDE_ADC_BASE               ADC0_BASE
 #define ALTITUDE_ADC_SEQUENCE           3
-#define ALTITUDE_ADC_SEQUENCE_PRIORITY  0    // Only one sequence used so priority doesn't matter.
+#define ALTITUDE_ADC_SEQUENCE_PRIORITY  0
 #define ALTITUDE_ADC_STEP               0
-
-// ADC input channel to be used. Should be set to ADC_CTL_CH0 for testing
-// with the potentiometer, and ADC_CTL_CH9 for actual altitude input.
 #define ALTITUDE_ADC_CHANNEL            ADC_CTL_CH9
 
 
 //*****************************************************************************
 // Static variables
 //*****************************************************************************
-
-// Circular buffer of size BUFFER_SIZE containing the ADC samples.
-static circBuf_t inBuffer;
-
-// Number of ADC samples taken, used to check whether buffer is filled yet.
-static uint32_t numSamplesTaken = 0;
-
+static circBuf_t inBuffer;    // Circular buffer containing ADC samples.
 static int16_t meanADC;       // Current mean ADC value.
 static int32_t sumADC;        // Current sum of the ADC samples in the buffer.
 static int16_t referenceADC;  // ADC value corresponding to 'landed' altitude.
+
+// Number of ADC samples taken, used to check whether buffer is filled yet.
+static uint32_t numSamplesTaken = 0;
 
 static int16_t desiredAltitude = 0;
 
@@ -105,7 +100,7 @@ static void initAltitudeADC(void) {
                    ALTITUDE_ADC_SEQUENCE,
                    altitudeADCIntHandler);
 
-    // Enable interrupts for the ADC sequence (clears any outstanding interrupts)
+    // Enable interrupts for the ADC sequence
     ADCIntEnable(ALTITUDE_ADC_BASE, ALTITUDE_ADC_SEQUENCE);
 }
 
@@ -115,7 +110,7 @@ static void initAltitudeADC(void) {
 // Should be called after all ADC-related initialisation has been done, to
 // ensure that ADC interrupts have started.
 //*****************************************************************************
-void altitudeSetInitialReference(void) {
+void altitudeSetReference(void) {
     // Wait for the buffer to be filled before setting the reference value.
     while (numSamplesTaken < BUF_SIZE) {}
     referenceADC = meanADC;
@@ -156,19 +151,26 @@ static void altitudeADCIntHandler(void) {
 }
 
 //*****************************************************************************
-// Returns the mean of the ADC samples currently in the buffer.
-//*****************************************************************************
-int16_t altitudeMeanADC(void) {
-    return meanADC;
-}
-
-//*****************************************************************************
 // Calculates and returns the current percentage altitude, based on the mean
 // sample value and relative to the global referenceSample, which represents
 // the landed altitude. Percentage can be positive or negative.
 //*****************************************************************************
 int16_t altitudePercent(void) {
     return (referenceADC - meanADC) * 100 / ADC_RANGE;
+}
+
+//*****************************************************************************
+// Adds the given amount to the desired altitude, ensuring that it remains
+// within the limits.
+//*****************************************************************************
+void altitudeChangeDesired(int16_t amount) {
+    desiredAltitude += amount;
+
+    if (desiredAltitude > MAX_ALTITUDE) {
+        desiredAltitude = MAX_ALTITUDE;
+    } else if (desiredAltitude < MIN_ALTITUDE) {
+        desiredAltitude = MIN_ALTITUDE;
+    }
 }
 
 //*****************************************************************************

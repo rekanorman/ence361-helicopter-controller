@@ -25,10 +25,9 @@
 // Constants
 //*****************************************************************************
 
-#define PWM_DIVIDER_CODE    SYSCTL_PWMDIV_4
-#define PWM_DIVIDER         4
-#define PWM_MAX_DUTY        95
-#define PWM_MIN_DUTY        5
+#define PWM_DIVIDER_CODE           SYSCTL_PWMDIV_4
+#define PWM_DIVIDER                4
+#define PWM_INITIAL_MAIN_DUTY      30
 
 // Main rotor.
 #define PWM_MAIN_ROTOR_FREQUENCY   250

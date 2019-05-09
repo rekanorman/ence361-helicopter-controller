@@ -21,15 +21,9 @@
 void initDisplay(void);
 
 //*****************************************************************************
-// Displays the appropriate information on the OLED display, based on the
-// current displayState.
+// Displays the appropriate information on the OLED display.
 //*****************************************************************************
 void displayUpdate(void);
-
-//*****************************************************************************
-// Cycle to the next display state.
-//*****************************************************************************
-void displayStateUpdate(void);
 
 
 #endif  // DISPLAY_H_

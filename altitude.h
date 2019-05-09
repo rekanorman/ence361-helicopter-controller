@@ -26,7 +26,7 @@ void initAltitude(void);
 // Should be called after all ADC-related initialisation has been done, to
 // ensure that ADC interrupts have started.
 //*****************************************************************************
-void altitudeSetInitialReference(void);
+void altitudeSetReference(void);
 
 //*****************************************************************************
 // Triggers a conversion on the ADC sequence being used to measure the
@@ -35,16 +35,17 @@ void altitudeSetInitialReference(void);
 void altitudeTriggerConversion(void);
 
 //*****************************************************************************
-// Returns the mean of the ADC samples currently in the buffer.
-//*****************************************************************************
-int16_t altitudeMeanADC(void);
-
-//*****************************************************************************
 // Calculates and returns the current percentage altitude, based on the mean
 // sample value and relative to the global referenceSample, which represents
 // the landed altitude. Percentage can be positive or negative
 //*****************************************************************************
 int16_t altitudePercent(void);
+
+//*****************************************************************************
+// Adds the given amount to the desired altitude, ensuring that it remains
+// within the limits.
+//*****************************************************************************
+void altitudeChangeDesired(int16_t amount);
 
 //*****************************************************************************
 // Returns the desired percentage altitude.

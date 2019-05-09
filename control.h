@@ -20,16 +20,10 @@
 void initControl(int16_t updateRate);
 
 //*****************************************************************************
-// Update the main motor duty cycle based on the current altitude and the
-// desired altitude.
+// Updates the main and tail motor duty cylces, based on the current altitude
+// and yaw errors.
 //*****************************************************************************
-void controlUpdateAltitude(void);
-
-//*****************************************************************************
-// Update the tail motor duty cycle based on the current yaw and the
-// desired yaw.
-//*****************************************************************************
-void controlUpdateYaw(void);
+void controlUpdate(void);
 
 
 #endif  // CONTROL_H_

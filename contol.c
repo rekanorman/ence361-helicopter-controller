@@ -22,18 +22,25 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define CONTROL_KP_ALTITUDE         1
-#define CONTROL_KI_ALTITUDE         0.2
-#define CONTROL_KP_YAW              1
-#define CONTROL_KI_YAW              0.5
+#define CONTROL_KP_ALTITUDE         10
+#define CONTROL_KI_ALTITUDE         3
+#define CONTROL_KP_YAW              17
+#define CONTROL_KI_YAW              6
 
 
 //*****************************************************************************
 // Static variables
 //*****************************************************************************
 static int16_t controlUpdateRate;
-//static double altitudeErrorIntegrated = 0;      // Units: 0.01%
-static double yawErrorIntegrated = 0;           // Units: 0.01 deg
+static int32_t altitudeErrorIntegrated = 0;      // Units: 0.01%
+static int32_t yawErrorIntegrated = 0;           // Units: 0.01 deg
+
+
+//*****************************************************************************
+// Static function forward declarations
+//*****************************************************************************
+static void controlUpdateAltitude(void);
+static void controlUpdateYaw(void);
 
 
 //*****************************************************************************
@@ -44,29 +51,60 @@ void initControl(int16_t updateRate) {
 }
 
 //*****************************************************************************
+// Updates the main and tail motor duty cylces, based on the current altitude
+// and yaw errors.
+//*****************************************************************************
+void controlUpdate(void) {
+    controlUpdateAltitude();
+    controlUpdateYaw();
+}
+
+//*****************************************************************************
 // Update the main motor duty cycle based on the current altitude and the
 // desired altitude.
 //*****************************************************************************
-void controlUpdateAltitude(void) {
-//    int16_t error = altitudeError();
-//    altitudeErrorIntegrated += error * 100 / CONTROL_UPDATE_FREQUENCY;
-//
-//    int16_t control = (CONTROL_KP_ALTITUDE * error * 100
-//                       + CONTROL_KI_ALTITUDE * altitudeErrorIntegrated) / 100;
+static void controlUpdateAltitude(void) {
+    int16_t error = altitudeError();
+    int32_t newIntegratedError = altitudeErrorIntegrated
+                                  + error * 100 / controlUpdateRate;
 
+    int16_t mainRotorDuty = (CONTROL_KP_ALTITUDE * error * 100
+                             + CONTROL_KI_ALTITUDE * newIntegratedError) / 1000;
 
+    if (mainRotorDuty > PWM_MAX_DUTY) {
+        mainRotorDuty = PWM_MAX_DUTY;
+    } else if (mainRotorDuty < PWM_MIN_DUTY) {
+        mainRotorDuty = PWM_MIN_DUTY;
+    } else {
+        // Only accumulate error signal if output is within its limits,
+        // to prevent integral windup.
+        altitudeErrorIntegrated = newIntegratedError;
+    }
+
+    setMainRotorPower(mainRotorDuty);
 }
 
 //*****************************************************************************
 // Update the tail motor duty cycle based on the current yaw and the
 // desired yaw.
 //*****************************************************************************
-void controlUpdateYaw(void) {
+static void controlUpdateYaw(void) {
     int16_t error = yawError();
-    yawErrorIntegrated += error * 100 / controlUpdateRate;
+    int32_t newIntegratedError = yawErrorIntegrated
+                                  + error * 100 / controlUpdateRate;
 
     int16_t tailRotorDuty = (CONTROL_KP_YAW * error * 100
-                        + CONTROL_KI_YAW * yawErrorIntegrated) / 100;
+                        + CONTROL_KI_YAW * newIntegratedError) / 1000;
+
+    if (tailRotorDuty > PWM_MAX_DUTY) {
+        tailRotorDuty = PWM_MAX_DUTY;
+    } else if (tailRotorDuty < PWM_MIN_DUTY) {
+        tailRotorDuty = PWM_MIN_DUTY;
+    } else {
+        // Only accumulate error signal if output is within its limits,
+        // to prevent integral windup.
+        yawErrorIntegrated = newIntegratedError;
+    }
 
     setTailRotorPower(tailRotorDuty);
 }

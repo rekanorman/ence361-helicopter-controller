@@ -30,7 +30,7 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define ALTITUDE_SAMPLE_RATE_HZ        100
+#define ALTITUDE_SAMPLE_RATE_HZ        400
 #define CONTROL_UPDATE_RATE_HZ         20
 #define DISPLAY_UPDATE_RATE_HZ         5
 #define BUTTON_CHECK_RATE_HZ           10
@@ -39,6 +39,7 @@
 // Altitude sampling is the highest frequency task, so use this as SysTick rate.
 #define SYSTICK_RATE_HZ                ALTITUDE_SAMPLE_RATE_HZ
 
+// The amount by which altitude and yaw change when the buttons are pushed.
 #define ALTITUDE_STEP_PERCENT    10
 #define YAW_STEP_DEGREES         15
 
@@ -47,9 +48,7 @@
 // The interrupt handler for the for SysTick interrupt.
 //*****************************************************************************
 void SysTickIntHandler(void) {
-    // Trigger an ADC conversion to measure the current altitude.
     altitudeTriggerConversion();
-
     updateButtons();
     schedulerUpdateTicks();
 }
@@ -80,12 +79,11 @@ void initSysTick(void) {
 }
 
 //*****************************************************************************
-// Checks if the UP or LEFT buttons have been pushed, and if so carries out
-// the appropriate actions.
+// Checks if any of the buttons have been pushed, and updates the desired
+// altitude and yaw as needed.
 // Note: buttons are updated regularly in the SysTickIntHandler.
 //*****************************************************************************
 void checkButtons(void) {
-    //Experimenting with rotors.
     if (checkButton(RIGHT) == PUSHED) {
         yawChangeDesired(YAW_STEP_DEGREES);
     }
@@ -95,11 +93,11 @@ void checkButtons(void) {
     }
 
     if (checkButton(UP) == PUSHED) {
-        setMainRotorPower(getMainRotorPower() + 5);
+        altitudeChangeDesired(ALTITUDE_STEP_PERCENT);
     }
 
     if (checkButton(DOWN) == PUSHED) {
-        setMainRotorPower(getMainRotorPower() - 5);
+        altitudeChangeDesired(-ALTITUDE_STEP_PERCENT);
     }
 
 }
@@ -119,23 +117,23 @@ int main(void) {
     initControl(CONTROL_UPDATE_RATE_HZ);
 
     // Initialise the scheduler and register the background tasks with it.
+    // Tasks are registered in order of priority, with highest first.
     initScheduler(4);
-
-    schedulerRegisterTask(controlUpdateYaw,
+    schedulerRegisterTask(controlUpdate,
                           SYSTICK_RATE_HZ / CONTROL_UPDATE_RATE_HZ);
+    schedulerRegisterTask(checkButtons,
+                          SYSTICK_RATE_HZ / BUTTON_CHECK_RATE_HZ);
     schedulerRegisterTask(displayUpdate,
                           SYSTICK_RATE_HZ / DISPLAY_UPDATE_RATE_HZ);
     schedulerRegisterTask(uartSendStatus,
                           SYSTICK_RATE_HZ / UART_SEND_RATE_HZ);
-    schedulerRegisterTask(checkButtons,
-                          SYSTICK_RATE_HZ / BUTTON_CHECK_RATE_HZ);
 
     // Enable interrupts to the processor once initialisation is complete.
     IntMasterEnable();
 
     // Set the reference altitude to the current altitude once all other
     // initialisation is complete (and interrupts are enabled).
-    altitudeSetInitialReference();
+    altitudeSetReference();
 
     // Start the rotors, setting their duty cycles to the minimum value.
     startMainRotor();
