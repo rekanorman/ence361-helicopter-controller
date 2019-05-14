@@ -23,7 +23,7 @@
 // Constants
 //*****************************************************************************
 #define CONTROL_KP_ALTITUDE         10
-#define CONTROL_KI_ALTITUDE         3
+#define CONTROL_KI_ALTITUDE         4
 #define CONTROL_KP_YAW              17
 #define CONTROL_KI_YAW              6
 
@@ -71,10 +71,10 @@ static void controlUpdateAltitude(void) {
     int16_t mainRotorDuty = (CONTROL_KP_ALTITUDE * error * 100
                              + CONTROL_KI_ALTITUDE * newIntegratedError) / 1000;
 
-    if (mainRotorDuty > PWM_MAX_DUTY) {
+    if (mainRotorDuty > PWM_MAX_DUTY && error > 0) {
         mainRotorDuty = PWM_MAX_DUTY;
-    } else if (mainRotorDuty < PWM_MIN_DUTY) {
-        mainRotorDuty = PWM_MIN_DUTY;
+    } else if (mainRotorDuty < PWM_MAIN_MIN_DUTY && error < 0) {
+        mainRotorDuty = PWM_MAIN_MIN_DUTY;
     } else {
         // Only accumulate error signal if output is within its limits,
         // to prevent integral windup.
@@ -96,10 +96,10 @@ static void controlUpdateYaw(void) {
     int16_t tailRotorDuty = (CONTROL_KP_YAW * error * 100
                         + CONTROL_KI_YAW * newIntegratedError) / 1000;
 
-    if (tailRotorDuty > PWM_MAX_DUTY) {
+    if (tailRotorDuty > PWM_MAX_DUTY && error > 0) {
         tailRotorDuty = PWM_MAX_DUTY;
-    } else if (tailRotorDuty < PWM_MIN_DUTY) {
-        tailRotorDuty = PWM_MIN_DUTY;
+    } else if (tailRotorDuty < PWM_TAIL_MIN_DUTY && error < 0) {
+        tailRotorDuty = PWM_TAIL_MIN_DUTY;
     } else {
         // Only accumulate error signal if output is within its limits,
         // to prevent integral windup.

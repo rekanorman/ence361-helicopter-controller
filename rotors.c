@@ -27,7 +27,6 @@
 
 #define PWM_DIVIDER_CODE           SYSCTL_PWMDIV_4
 #define PWM_DIVIDER                4
-#define PWM_INITIAL_MAIN_DUTY      30
 
 // Main rotor.
 #define PWM_MAIN_ROTOR_FREQUENCY   250
@@ -125,7 +124,7 @@ static void initialiseTailRotor() {
 //*****************************************************************************
 void startMainRotor() {
     PWMOutputState(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTBIT, true);
-    setMainRotorPower(PWM_MIN_DUTY);
+    setMainRotorPower(PWM_MAIN_MIN_DUTY);
 }
 
 //*****************************************************************************
@@ -133,7 +132,7 @@ void startMainRotor() {
 //*****************************************************************************
 void startTailRotor() {
     PWMOutputState(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTBIT, true);
-    setTailRotorPower(PWM_MIN_DUTY);
+    setTailRotorPower(PWM_TAIL_MIN_DUTY);
 }
 
 //*****************************************************************************
@@ -167,8 +166,8 @@ static uint32_t calculatePulseWidth(uint32_t dutyCycle, uint32_t period) {
 void setMainRotorPower(int16_t power) {
     if (power > PWM_MAX_DUTY) {
         power = PWM_MAX_DUTY;
-    } else if (power < PWM_MIN_DUTY) {
-        power = PWM_MIN_DUTY;
+    } else if (power < PWM_MAIN_MIN_DUTY) {
+        power = PWM_MAIN_MIN_DUTY;
     }
     uint32_t pulsePeriod = calculatePulsePeriod(PWM_MAIN_ROTOR_FREQUENCY);
     uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);
@@ -186,8 +185,8 @@ void setMainRotorPower(int16_t power) {
 void setTailRotorPower(int16_t power) {
     if (power > PWM_MAX_DUTY) {
         power = PWM_MAX_DUTY;
-    } else if (power < PWM_MIN_DUTY) {
-        power = PWM_MIN_DUTY;
+    } else if (power < PWM_TAIL_MIN_DUTY) {
+        power = PWM_TAIL_MIN_DUTY;
     }
     uint32_t pulsePeriod = calculatePulsePeriod(PWM_TAIL_ROTOR_FREQUENCY);
     uint32_t pulseWidth = calculatePulseWidth(power, pulsePeriod);

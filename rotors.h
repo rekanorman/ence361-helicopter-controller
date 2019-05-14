@@ -18,7 +18,8 @@
 // Public constants
 //*****************************************************************************
 #define PWM_MAX_DUTY        95
-#define PWM_MIN_DUTY        5
+#define PWM_MAIN_MIN_DUTY   20
+#define PWM_TAIL_MIN_DUTY   5
 
 
 //*****************************************************************************

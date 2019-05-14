@@ -25,6 +25,7 @@
 #include "scheduler.h"
 #include "rotors.h"
 #include "control.h"
+#include "flightState.h"
 
 
 //*****************************************************************************
@@ -35,6 +36,7 @@
 #define DISPLAY_UPDATE_RATE_HZ         5
 #define BUTTON_CHECK_RATE_HZ           10
 #define UART_SEND_RATE_HZ              4
+#define YAW_REFRENCE_STEP_RATE_HZ      2
 
 // Altitude sampling is the highest frequency task, so use this as SysTick rate.
 #define SYSTICK_RATE_HZ                ALTITUDE_SAMPLE_RATE_HZ
@@ -42,6 +44,12 @@
 // The amount by which altitude and yaw change when the buttons are pushed.
 #define ALTITUDE_STEP_PERCENT    10
 #define YAW_STEP_DEGREES         15
+
+
+//*****************************************************************************
+// Global variables
+//*****************************************************************************
+flightState_t flightState = TAKING_OFF;   // declared in flightState.h
 
 
 //*****************************************************************************
@@ -118,9 +126,11 @@ int main(void) {
 
     // Initialise the scheduler and register the background tasks with it.
     // Tasks are registered in order of priority, with highest first.
-    initScheduler(4);
+    initScheduler(5);
     schedulerRegisterTask(controlUpdate,
                           SYSTICK_RATE_HZ / CONTROL_UPDATE_RATE_HZ);
+    schedulerRegisterTask(yawFindReference,
+                          SYSTICK_RATE_HZ / YAW_REFRENCE_STEP_RATE_HZ);
     schedulerRegisterTask(checkButtons,
                           SYSTICK_RATE_HZ / BUTTON_CHECK_RATE_HZ);
     schedulerRegisterTask(displayUpdate,

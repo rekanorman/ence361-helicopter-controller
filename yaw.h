@@ -15,13 +15,19 @@
 
 
 //*****************************************************************************
-// Performs initialisation for measuring the yaw.
+// Performs initialisation of the GPIO pins and interrupts used for
+// measuring the yaw.
 //*****************************************************************************
 void initYaw(void);
 
 //*****************************************************************************
-// Calculate and return the yaw in dregrees, relative to the position when
-// the program started.
+// If the helicopter is currently taking off, the desired yaw is incremented
+// to rotate the helicopter in steps until the yaw reference point is found.
+//*****************************************************************************
+void yawFindReference (void);
+
+//*****************************************************************************
+// Calculate and return the yaw in degrees, relative to the reference position.
 //*****************************************************************************
 int16_t yawDegrees(void);
 
