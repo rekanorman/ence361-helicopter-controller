@@ -93,22 +93,25 @@ void initSysTick(void) {
 // Note: buttons are updated regularly in the SysTickIntHandler.
 //*****************************************************************************
 void checkButtons(void) {
-    if (checkButton(RIGHT) == PUSHED) {
-        yawChangeDesired(YAW_STEP_DEGREES);
+    if (flightState == FLYING) {
+        if (checkButton(RIGHT) == PUSHED) {
+            yawChangeDesired(YAW_STEP_DEGREES);
+        }
+
+        if (checkButton(LEFT) == PUSHED) {
+            yawChangeDesired(-YAW_STEP_DEGREES);
+        }
+
+        if (checkButton(UP) == PUSHED) {
+            altitudeChangeDesired(ALTITUDE_STEP_PERCENT);
+        }
+
+        if (checkButton(DOWN) == PUSHED) {
+            altitudeChangeDesired(-ALTITUDE_STEP_PERCENT);
+        }
     }
 
-    if (checkButton(LEFT) == PUSHED) {
-        yawChangeDesired(-YAW_STEP_DEGREES);
-    }
-
-    if (checkButton(UP) == PUSHED) {
-        altitudeChangeDesired(ALTITUDE_STEP_PERCENT);
-    }
-
-    if (checkButton(DOWN) == PUSHED) {
-        altitudeChangeDesired(-ALTITUDE_STEP_PERCENT);
-    }
-
+    //TODO (mct63): Either move to a check switch function or update documentation.
     if (checkSwitch1() == SWITCH_UP) {
         if (flightState == LANDED) {
             // Start the rotors, setting their duty cycles to the minimum value.

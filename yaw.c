@@ -151,6 +151,7 @@ static void yawReferenceIntHandler(void) {
         desiredYaw = 0;
         flightState = FLYING;
     } else if (flightState == LANDING_FINDING_REFERENCE) {
+        //TODO (mct63): Move or document this.
         yawChange = 0;
         desiredYaw = 0;
         flightState = LANDING;
