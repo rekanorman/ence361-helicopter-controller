@@ -16,6 +16,7 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 #include "flightState.h"
+#include "altitude.h"
 
 #include "yaw.h"
 
@@ -149,6 +150,11 @@ static void yawReferenceIntHandler(void) {
         yawChange = 0;
         desiredYaw = 0;
         flightState = FLYING;
+    } else if (flightState == LANDING_FINDING_REFERENCE) {
+        yawChange = 0;
+        desiredYaw = 0;
+        flightState = LANDING;
+        altitudeChangeDesired(-altitudePercent());
     }
 
     GPIOIntClear(YAW_REFERENCE_GPIO_BASE, YAW_REFERENCE_PIN);
@@ -160,7 +166,8 @@ static void yawReferenceIntHandler(void) {
 // is found.
 //*****************************************************************************
 void yawFindReference (void) {
-    if (flightState == TAKING_OFF) {
+    // TODO (mct63): Document.
+    if (flightState == TAKING_OFF || flightState == LANDING_FINDING_REFERENCE) {
         yawChangeDesired(YAW_FIND_REFERENCE_STEP);
     }
 }

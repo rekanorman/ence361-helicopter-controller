@@ -38,6 +38,16 @@ void startMainRotor();
 void startTailRotor();
 
 //*****************************************************************************
+// Stops the main rotor, by disabling the PWM output.
+//*****************************************************************************
+void stopMainRotor();
+
+//*****************************************************************************
+// Stops the tail rotor, by disabling the PWM output.
+//*****************************************************************************
+void stopTailRotor();
+
+//*****************************************************************************
 // Sets the power of the main rotor.
 //
 // power: The power level percentage to set the main rotor to.

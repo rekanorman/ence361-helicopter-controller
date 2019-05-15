@@ -15,6 +15,7 @@
 #include "altitude.h"
 #include "yaw.h"
 #include "rotors.h"
+#include "flightState.h"
 
 #include "control.h"
 
@@ -82,6 +83,13 @@ static void controlUpdateAltitude(void) {
     }
 
     setMainRotorPower(mainRotorDuty);
+
+    //TODO(mct63): Move somewhere better.
+    if (flightState == LANDING && altitudePercent() <= 0) {
+        flightState = LANDED;
+        stopMainRotor();
+        stopTailRotor();
+    }
 }
 
 //*****************************************************************************

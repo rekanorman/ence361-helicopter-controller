@@ -28,6 +28,7 @@
 #include "altitude.h"
 #include "yaw.h"
 #include "rotors.h"
+#include "flightState.h"
 
 #include "uartUSB.h"
 
@@ -94,6 +95,9 @@ void uartSendStatus(void) {
     uartSend(status);
 
     usprintf(status, "Tail: %5d%%  \r\n", getTailRotorPower());
+    uartSend(status);
+
+    usprintf(status, "Flight State: %5d\r\n", flightState);
     uartSend(status);
 }
 

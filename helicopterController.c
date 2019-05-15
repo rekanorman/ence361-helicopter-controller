@@ -17,6 +17,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/debug.h"
 #include "buttons4.h"
+#include "switch.h"
 #include "circBufT.h"
 #include "uartUSB.h"
 #include "altitude.h"
@@ -49,7 +50,7 @@
 //*****************************************************************************
 // Global variables
 //*****************************************************************************
-flightState_t flightState = TAKING_OFF;   // declared in flightState.h
+flightState_t flightState = LANDED;   // declared in flightState.h
 
 
 //*****************************************************************************
@@ -108,6 +109,21 @@ void checkButtons(void) {
         altitudeChangeDesired(-ALTITUDE_STEP_PERCENT);
     }
 
+    if (checkSwitch1() == SWITCH_UP) {
+        if (flightState == LANDED) {
+            // Start the rotors, setting their duty cycles to the minimum value.
+            startMainRotor();
+            startTailRotor();
+            flightState = TAKING_OFF;
+        }
+    }
+
+    if (checkSwitch1() == SWITCH_DOWN) {
+        if (flightState == FLYING) {
+            flightState = LANDING_FINDING_REFERENCE;
+        }
+    }
+
 }
 
 int main(void) {
@@ -118,6 +134,7 @@ int main(void) {
     initSysTick();
     initUart();
     initButtons();
+    initSwitch();
     initDisplay();
     initAltitude();
     initYaw();
@@ -145,9 +162,9 @@ int main(void) {
     // initialisation is complete (and interrupts are enabled).
     altitudeSetReference();
 
-    // Start the rotors, setting their duty cycles to the minimum value.
-    startMainRotor();
-    startTailRotor();
+//    // Start the rotors, setting their duty cycles to the minimum value.
+//    startMainRotor();
+//    startTailRotor();
 
     // Start running the background tasks.
     schedulerStart();

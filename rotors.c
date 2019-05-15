@@ -136,6 +136,21 @@ void startTailRotor() {
 }
 
 //*****************************************************************************
+// Stops the main rotor, by disabling the PWM output.
+//*****************************************************************************
+void stopMainRotor() {
+    PWMOutputState(PWM_MAIN_ROTOR_BASE, PWM_MAIN_ROTOR_OUTBIT, false);
+}
+
+//*****************************************************************************
+// Stops the tail rotor, by disabling the PWM output.
+//*****************************************************************************
+void stopTailRotor() {
+    PWMOutputState(PWM_TAIL_ROTOR_BASE, PWM_TAIL_ROTOR_OUTBIT, false);
+}
+
+
+//*****************************************************************************
 // Calculates the period of the PWM signal (in clock ticks) for the given
 // frequency.
 //

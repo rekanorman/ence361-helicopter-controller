@@ -17,7 +17,7 @@
 
 
 // A type representing the possible states of the helicopter.
-enum flightStates {LANDED = 0, TAKING_OFF, FLYING, LANDING};
+enum flightStates {LANDED = 0, TAKING_OFF, FLYING, LANDING_FINDING_REFERENCE, LANDING};
 typedef enum flightStates flightState_t;
 
 
