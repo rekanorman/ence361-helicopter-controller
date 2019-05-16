@@ -27,8 +27,8 @@
 enum butNames {UP = 0, DOWN, LEFT, RIGHT, NUM_BUTS};
 enum butStates {RELEASED = 0, PUSHED, NO_CHANGE};
 
-typedef enum butNames button_name_t;
-typedef enum butStates button_state_t;
+typedef enum butNames buttonName_t;
+typedef enum butStates buttonState_t;
 
 // UP button
 #define UP_BUT_PERIPH  SYSCTL_PERIPH_GPIOE
@@ -76,7 +76,7 @@ updateButtons(void);
 // (PUSHED or RELEASED) has changed since the last call, otherwise returns
 // NO_CHANGE.  The argument butName should be one of constants in the
 // enumeration butStates, excluding 'NUM_BUTS'. Safe under interrupt.
-uint8_t
-checkButton(uint8_t butName);
+buttonState_t
+checkButton(buttonName_t butName);
 
 #endif  // BUTTONS4_H_

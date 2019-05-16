@@ -116,7 +116,7 @@ void updateButtons(void) {
 // checkButton: Function returns the new button logical state if the button
 // logical state (PUSHED or RELEASED) has changed since the last call,
 // otherwise returns NO_CHANGE.
-button_state_t checkButton(button_name_t butName) {
+buttonState_t checkButton(buttonName_t butName) {
     if (but_flag[butName]) {
         but_flag[butName] = false;
         if (but_state[butName] == but_normal[butName]) {

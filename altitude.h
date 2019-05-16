@@ -48,6 +48,11 @@ int16_t altitudePercent(void);
 void altitudeChangeDesired(int16_t amount);
 
 //*****************************************************************************
+// Sets the desired altitude to the given value.
+//*****************************************************************************
+void altitudeSetDesired(int16_t altitude);
+
+//*****************************************************************************
 // Returns the desired percentage altitude.
 //*****************************************************************************
 int16_t altitudeDesired(void);

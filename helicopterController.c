@@ -36,8 +36,10 @@
 #define CONTROL_UPDATE_RATE_HZ         20
 #define DISPLAY_UPDATE_RATE_HZ         5
 #define BUTTON_CHECK_RATE_HZ           10
+#define SWITCH_CHECK_RATE_HZ           5
 #define UART_SEND_RATE_HZ              4
 #define YAW_REFRENCE_STEP_RATE_HZ      2
+#define CHECK_LANDING_RATE_HZ          5
 
 // Altitude sampling is the highest frequency task, so use this as SysTick rate.
 #define SYSTICK_RATE_HZ                ALTITUDE_SAMPLE_RATE_HZ
@@ -48,17 +50,12 @@
 
 
 //*****************************************************************************
-// Global variables
-//*****************************************************************************
-flightState_t flightState = LANDED;   // declared in flightState.h
-
-
-//*****************************************************************************
 // The interrupt handler for the for SysTick interrupt.
 //*****************************************************************************
 void SysTickIntHandler(void) {
     altitudeTriggerConversion();
     updateButtons();
+    updateSwitch1();
     schedulerUpdateTicks();
 }
 
@@ -93,7 +90,7 @@ void initSysTick(void) {
 // Note: buttons are updated regularly in the SysTickIntHandler.
 //*****************************************************************************
 void checkButtons(void) {
-    if (flightState == FLYING) {
+    if (getFlightState() == FLYING) {
         if (checkButton(RIGHT) == PUSHED) {
             yawChangeDesired(YAW_STEP_DEGREES);
         }
@@ -110,23 +107,40 @@ void checkButtons(void) {
             altitudeChangeDesired(-ALTITUDE_STEP_PERCENT);
         }
     }
+}
 
-    //TODO (mct63): Either move to a check switch function or update documentation.
-    if (checkSwitch1() == SWITCH_UP) {
-        if (flightState == LANDED) {
-            // Start the rotors, setting their duty cycles to the minimum value.
-            startMainRotor();
-            startTailRotor();
-            flightState = TAKING_OFF;
-        }
+//*****************************************************************************
+// Checks the state of the switch and performs the appropriate actions to
+// change the state of the helicopter.
+//*****************************************************************************
+void checkSwitch(void) {
+    switchState_t switchState = checkSwitch1();
+
+    if (switchState == SWITCH_UP && getFlightState() == LANDED) {
+        startMainRotor();
+        startTailRotor();
+        setFlightState(FINDING_YAW_REFERENCE);
+
+    } else if (switchState == SWITCH_DOWN && getFlightState() == FLYING) {
+        yawSetDesired(0);
+        setFlightState(LANDING_YAW);
     }
+}
 
-    if (checkSwitch1() == SWITCH_DOWN) {
-        if (flightState == FLYING) {
-            flightState = LANDING_FINDING_REFERENCE;
-        }
+//*****************************************************************************
+// If the helicopter is currently landing (trying to restore either the yaw
+// or the altitude to zero), checks whether the error has reached zero and
+// changes the state of the helicopter as necessary.
+//*****************************************************************************
+void checkLanding(void) {
+    if (getFlightState() == LANDING_YAW && yawError() == 0) {
+        altitudeSetDesired(0);
+        setFlightState(LANDING_ALTITUDE);
+    } else if (getFlightState() == LANDING_ALTITUDE && altitudeError() == 0) {
+        stopMainRotor();
+        stopTailRotor();
+        setFlightState(LANDED);
     }
-
 }
 
 int main(void) {
@@ -144,15 +158,21 @@ int main(void) {
     initRotors();
     initControl(CONTROL_UPDATE_RATE_HZ);
 
+    setFlightState(LANDED);
+
     // Initialise the scheduler and register the background tasks with it.
     // Tasks are registered in order of priority, with highest first.
-    initScheduler(5);
+    initScheduler(7);
     schedulerRegisterTask(controlUpdate,
                           SYSTICK_RATE_HZ / CONTROL_UPDATE_RATE_HZ);
     schedulerRegisterTask(yawFindReference,
                           SYSTICK_RATE_HZ / YAW_REFRENCE_STEP_RATE_HZ);
     schedulerRegisterTask(checkButtons,
                           SYSTICK_RATE_HZ / BUTTON_CHECK_RATE_HZ);
+    schedulerRegisterTask(checkSwitch,
+                          SYSTICK_RATE_HZ / SWITCH_CHECK_RATE_HZ);
+    schedulerRegisterTask(checkLanding,
+                          SYSTICK_RATE_HZ / CHECK_LANDING_RATE_HZ);
     schedulerRegisterTask(displayUpdate,
                           SYSTICK_RATE_HZ / DISPLAY_UPDATE_RATE_HZ);
     schedulerRegisterTask(uartSendStatus,
@@ -164,10 +184,6 @@ int main(void) {
     // Set the reference altitude to the current altitude once all other
     // initialisation is complete (and interrupts are enabled).
     altitudeSetReference();
-
-//    // Start the rotors, setting their duty cycles to the minimum value.
-//    startMainRotor();
-//    startTailRotor();
 
     // Start running the background tasks.
     schedulerStart();

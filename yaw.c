@@ -50,6 +50,8 @@
 
 // Yaw value relative to reference. Each slot corresponds to a yaw change of 4.
 static int16_t yawChange = 0;
+
+// The desired yaw value in degrees, in the range -180 to 180 degrees.
 static int16_t desiredYaw = 0;
 
 
@@ -58,6 +60,7 @@ static int16_t desiredYaw = 0;
 //*****************************************************************************
 static void yawChannelIntHandler(void);
 static void yawReferenceIntHandler(void);
+static int16_t convertYawToRange(int16_t yaw);
 
 
 //*****************************************************************************
@@ -146,16 +149,10 @@ static void yawChannelIntHandler(void) {
 // to zero. Otherwise the interrupt is ignored.
 //*****************************************************************************
 static void yawReferenceIntHandler(void) {
-    if (flightState == TAKING_OFF) {
+    if (getFlightState() == FINDING_YAW_REFERENCE) {
         yawChange = 0;
         desiredYaw = 0;
-        flightState = FLYING;
-    } else if (flightState == LANDING_FINDING_REFERENCE) {
-        //TODO (mct63): Move or document this.
-        yawChange = 0;
-        desiredYaw = 0;
-        flightState = LANDING;
-        altitudeChangeDesired(-altitudePercent());
+        setFlightState(FLYING);
     }
 
     GPIOIntClear(YAW_REFERENCE_GPIO_BASE, YAW_REFERENCE_PIN);
@@ -167,38 +164,52 @@ static void yawReferenceIntHandler(void) {
 // is found.
 //*****************************************************************************
 void yawFindReference (void) {
-    // TODO (mct63): Document.
-    if (flightState == TAKING_OFF || flightState == LANDING_FINDING_REFERENCE) {
+    if (getFlightState() == FINDING_YAW_REFERENCE) {
         yawChangeDesired(YAW_FIND_REFERENCE_STEP);
     }
 }
 
 //*****************************************************************************
+// Takes an arbitrary yaw value in degrees, and converts it to an equivalent
+// value in the range of -180 to 180 degrees.
+//*****************************************************************************
+static int16_t convertYawToRange(int16_t yaw) {
+    yaw %= DEGREES_IN_CIRCLE;
+    if (yaw < -DEGREES_IN_CIRCLE / 2) {
+        yaw += DEGREES_IN_CIRCLE;
+    } else if (yaw >= DEGREES_IN_CIRCLE / 2) {
+        yaw -= DEGREES_IN_CIRCLE;
+    }
+    return yaw;
+}
+
+//*****************************************************************************
 // Calculate and return the yaw in degrees, relative to the reference position.
+// The yaw will be in the range of -180 to 180 degrees.
 //*****************************************************************************
 int16_t yawDegrees(void) {
     // Convert yawChange to degrees.
     int16_t degrees = yawChange * DEGREES_IN_CIRCLE / SLOTS_IN_CIRCLE
                       / YAW_CHANGE_PER_SLOT;
-    // Find remainder when divided by the number of degrees in a circle.
-//    degrees = degrees % DEGREES_IN_CIRCLE;
 
-    // Don't limit yaw range for now, to simplify control.
-
-    // Ensure the returned value is between -180 and 179.
-//    if (degrees < -DEGREES_IN_CIRCLE / 2) {
-//        degrees += DEGREES_IN_CIRCLE;
-//    } else if (degrees >= DEGREES_IN_CIRCLE / 2) {
-//        degrees -= DEGREES_IN_CIRCLE;
-//    }
-    return degrees;
+    return convertYawToRange(degrees);
 }
 
 //*****************************************************************************
-// Adds the given amount to the desired yaw.
+// Adds the given amount to the desired yaw, ensuring that the desired yaw
+// remains in the range of 180 to -180 degrees.
 //*****************************************************************************
 void yawChangeDesired(int16_t amount) {
-    desiredYaw += amount;
+    desiredYaw = convertYawToRange(desiredYaw + amount);
+
+}
+
+//*****************************************************************************
+// Sets the desired yaw to the given value, ensuring it is in the range of
+// -180 to 180 degrees.
+//*****************************************************************************
+void yawSetDesired(int16_t yaw) {
+    desiredYaw = convertYawToRange(yaw);
 }
 
 //*****************************************************************************
@@ -210,9 +221,10 @@ int16_t yawDesired(void) {
 
 //*****************************************************************************
 // Calculates and returns the difference between the desired yaw and the
-// actual yaw, in degrees.
+// actual yaw in degrees, taking into account that both these values are in
+// the range -180 to 180 degrees. Therefore the returned error will also be
+// in this range.
 //*****************************************************************************
 int16_t yawError(void) {
-    return desiredYaw - yawDegrees();
+    return convertYawToRange(desiredYaw - yawDegrees());
 }
-

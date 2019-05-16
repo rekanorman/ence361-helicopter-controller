@@ -13,9 +13,12 @@
 #ifndef SWITCH_H_
 #define SWITCH_H_
 
-// Type for the state of the switch.
-enum switchStates {SWITCH_UP = 0, SWITCH_DOWN};
-typedef enum switchStates switch_state_t;
+
+// Type for the state of the switch SWITCH_UP and SWITCH_DOWN mean that the
+// switch has been moved since it was last checked.
+enum switchStates {SWITCH_UNCHANGED = 0, SWITCH_UP, SWITCH_DOWN};
+typedef enum switchStates switchState_t;
+
 
 //*****************************************************************************
 // Performs initialisation for the main switch.
@@ -23,10 +26,16 @@ typedef enum switchStates switch_state_t;
 void initSwitch();
 
 //*****************************************************************************
-// Checks the current state of state of SW1.
-//
-// returns: The current state of SW1, either SWITCH_UP or SWITCH_DOWN.
+// Checks if the switch position has changed since the last call, and updates
+// the switch state as necessary.
 //*****************************************************************************
-switch_state_t checkSwitch1();
+void updateSwitch1(void);
+
+//*****************************************************************************
+// Returns the current state of the switch, indicating whether it has been
+// switched up or down, or is unchanged since the last call to this function.
+//*****************************************************************************
+switchState_t checkSwitch1();
+
 
 #endif  // SWITCH_H_

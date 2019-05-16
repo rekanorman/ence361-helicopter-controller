@@ -28,13 +28,21 @@ void yawFindReference (void);
 
 //*****************************************************************************
 // Calculate and return the yaw in degrees, relative to the reference position.
+// The yaw will be in the range -180 to 180 degrees.
 //*****************************************************************************
 int16_t yawDegrees(void);
 
 //*****************************************************************************
-// Adds the given amount to the desired yaw.
+// Adds the given amount to the desired yaw, ensuring that the desired yaw
+// remains in the range of 180 to -180 degrees.
 //*****************************************************************************
 void yawChangeDesired(int16_t amount);
+
+//*****************************************************************************
+// Sets the desired yaw to the given value, ensuring it is in the range of
+// -180 to 180 degrees.
+//*****************************************************************************
+void yawSetDesired(int16_t yaw);
 
 //*****************************************************************************
 // Returns the desired yaw in degrees.
@@ -43,7 +51,9 @@ int16_t yawDesired(void);
 
 //*****************************************************************************
 // Calculates and returns the difference between the desired yaw and the
-// actual yaw, in degrees.
+// actual yaw in degrees, taking into account that both these values are in
+// the range -180 to 180 degrees. Therefore the returned error will also be
+// in this range.
 //*****************************************************************************
 int16_t yawError(void);
 

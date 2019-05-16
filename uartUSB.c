@@ -97,7 +97,7 @@ void uartSendStatus(void) {
     usprintf(status, "Tail: %5d%%  \r\n", getTailRotorPower());
     uartSend(status);
 
-    usprintf(status, "Flight State: %5d\r\n", flightState);
+    usprintf(status, "%14s\r\n", flightStateString());
     uartSend(status);
 }
 

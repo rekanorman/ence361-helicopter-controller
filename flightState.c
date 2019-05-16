@@ -1,6 +1,6 @@
 //*****************************************************************************
 //
-// File: flightState.h
+// File: flightState.c
 //
 // Authors: Reka Norman (rkn24)
 //          Matthew Toohey (mct63)
@@ -12,34 +12,37 @@
 //
 //*****************************************************************************
 
-#ifndef FLIGHT_STATE_H_
-#define FLIGHT_STATE_H_
+#include "flightState.h"
 
 
-// A type representing the possible states of the helicopter.
-enum flightStates {LANDED = 0,             // Stationary with rotors off
-                   FINDING_YAW_REFERENCE,  // Rotating in steps to find reference
-                   FLYING,
-                   LANDING_YAW,       // Restoring the yaw to zero for landing
-                   LANDING_ALTITUDE}; // Restoring the altitude to zero for landing
-
-typedef enum flightStates flightState_t;
+// The current state of the helicopter.
+static flightState_t flightState;
 
 
 //*****************************************************************************
 // Returns the current state of the helicopter.
 //*****************************************************************************
-flightState_t getFlightState(void);
+flightState_t getFlightState(void) {
+    return flightState;
+}
 
 //*****************************************************************************
 // Sets the current state to the given value.
 //*****************************************************************************
-void setFlightState(flightState_t state);
+void setFlightState(flightState_t state) {
+    flightState = state;
+}
 
 //*****************************************************************************
 // Returns the current state as a string to be displayed.
 //*****************************************************************************
-char* flightStateString(void);
-
-
-#endif  // FLIGHT_STATE_H_
+char* flightStateString(void) {
+    switch (flightState) {
+        case LANDED: return "Landed";
+        case FINDING_YAW_REFERENCE: return "Taking off";
+        case FLYING: return "Flying";
+        case LANDING_YAW: return "Landing";
+        case LANDING_ALTITUDE: return "Landing";
+    }
+    return "";
+}
