@@ -41,7 +41,7 @@
 #define YAW_CHANGE_PER_SLOT         4
 
 // The step size used when rotating the helicopter to find the reference point.
-#define YAW_FIND_REFERENCE_STEP     10
+#define YAW_FIND_REFERENCE_STEP     15
 
 
 //*****************************************************************************

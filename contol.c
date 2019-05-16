@@ -24,16 +24,22 @@
 // Constants
 //*****************************************************************************
 #define CONTROL_KP_ALTITUDE         10
+#define CONTROL_KD_ALTITUDE         4
 #define CONTROL_KI_ALTITUDE         4
 #define CONTROL_KP_YAW              17
-#define CONTROL_KI_YAW              6
+#define CONTROL_KD_YAW              2
+#define CONTROL_KI_YAW              4
 
 
 //*****************************************************************************
 // Static variables
 //*****************************************************************************
 static int16_t controlUpdateRate;
+
+static int16_t altitudeErrorPrevious = 0;        // Units: %
 static int32_t altitudeErrorIntegrated = 0;      // Units: 0.01%
+
+static int16_t yawErrorPrevious = 0;             // Units: deg
 static int32_t yawErrorIntegrated = 0;           // Units: 0.01 deg
 
 
@@ -66,11 +72,16 @@ void controlUpdate(void) {
 //*****************************************************************************
 static void controlUpdateAltitude(void) {
     int16_t error = altitudeError();
+    int16_t errorDerivative = (error - altitudeErrorPrevious)
+                               * controlUpdateRate;
     int32_t newIntegratedError = altitudeErrorIntegrated
                                   + error * 100 / controlUpdateRate;
 
     int16_t mainRotorDuty = (CONTROL_KP_ALTITUDE * error * 100
+                             + CONTROL_KD_ALTITUDE * errorDerivative * 100
                              + CONTROL_KI_ALTITUDE * newIntegratedError) / 1000;
+
+    altitudeErrorPrevious = error;
 
     if (mainRotorDuty > PWM_MAX_DUTY && error > 0) {
         mainRotorDuty = PWM_MAX_DUTY;
@@ -91,11 +102,15 @@ static void controlUpdateAltitude(void) {
 //*****************************************************************************
 static void controlUpdateYaw(void) {
     int16_t error = yawError();
+    int16_t errorDerivative = (error - yawErrorPrevious) * controlUpdateRate;
     int32_t newIntegratedError = yawErrorIntegrated
                                   + error * 100 / controlUpdateRate;
 
     int16_t tailRotorDuty = (CONTROL_KP_YAW * error * 100
+                        + CONTROL_KD_YAW * errorDerivative * 100
                         + CONTROL_KI_YAW * newIntegratedError) / 1000;
+
+    yawErrorPrevious = error;
 
     if (tailRotorDuty > PWM_MAX_DUTY && error > 0) {
         tailRotorDuty = PWM_MAX_DUTY;
