@@ -23,13 +23,12 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define CONTROL_KP_ALTITUDE         10
-#define CONTROL_KD_ALTITUDE         4
-#define CONTROL_KI_ALTITUDE         4
+#define CONTROL_KP_ALTITUDE         8
+#define CONTROL_KD_ALTITUDE         3
+#define CONTROL_KI_ALTITUDE         3
 #define CONTROL_KP_YAW              17
-#define CONTROL_KD_YAW              2
-#define CONTROL_KI_YAW              4
-
+#define CONTROL_KD_YAW              5
+#define CONTROL_KI_YAW              5
 
 //*****************************************************************************
 // Static variables
