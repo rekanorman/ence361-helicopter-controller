@@ -28,7 +28,7 @@
 #define CONTROL_KI_ALTITUDE         4
 #define CONTROL_KP_YAW              17
 #define CONTROL_KD_YAW              2
-#define CONTROL_KI_YAW              4
+#define CONTROL_KI_YAW              2
 
 
 //*****************************************************************************
@@ -108,7 +108,7 @@ static void controlUpdateYaw(void) {
 
     int16_t tailRotorDuty = (CONTROL_KP_YAW * error * 100
                         + CONTROL_KD_YAW * errorDerivative * 100
-                        + CONTROL_KI_YAW * newIntegratedError) / 1000;
+                        + CONTROL_KI_YAW * newIntegratedError + 8*getMainRotorPower()*100) / 1000;
 
     yawErrorPrevious = error;
 
