@@ -106,6 +106,10 @@ void checkButtons(void) {
         if (checkButton(DOWN) == PUSHED) {
             altitudeChangeDesired(-ALTITUDE_STEP_PERCENT);
         }
+
+        if (checkButton(RESET) == PUSHED) {
+            SysCtlReset();
+        }
     }
 }
 

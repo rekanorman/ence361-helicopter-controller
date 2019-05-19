@@ -1,4 +1,4 @@
-// *******************************************************
+// ****************************************************************************
 //
 // File: buttons4.h
 //
@@ -12,7 +12,7 @@
 // The buttons are:  UP and DOWN (on the Orbit daughterboard) plus
 // LEFT and RIGHT on the Tiva.
 //
-// *******************************************************
+// ****************************************************************************
 
 #ifndef BUTTONS4_H_
 #define BUTTONS4_H_
@@ -21,10 +21,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-enum butNames {UP = 0, DOWN, LEFT, RIGHT, NUM_BUTS};
+enum butNames {UP = 0, DOWN, LEFT, RIGHT, RESET, NUM_BUTS};
 enum butStates {RELEASED = 0, PUSHED, NO_CHANGE};
 
 typedef enum butNames buttonName_t;
@@ -50,33 +51,40 @@ typedef enum butStates buttonState_t;
 #define RIGHT_BUT_PORT_BASE  GPIO_PORTF_BASE
 #define RIGHT_BUT_PIN  GPIO_PIN_0
 #define RIGHT_BUT_NORMAL  true
+// RESET button
+#define RESET_BUT_PERIPH  SYSCTL_PERIPH_GPIOA
+#define RESET_BUT_PORT_BASE  GPIO_PORTA_BASE
+#define RESET_BUT_PIN  GPIO_PIN_6
+#define RESET_BUT_NORMAL  true
 
-#define NUM_BUT_POLLS 3
 // Debounce algorithm: A state machine is associated with each button.
 // A state change occurs only after NUM_BUT_POLLS consecutive polls have
 // read the pin in the opposite condition, before the state changes and
 // a flag is set.  Set NUM_BUT_POLLS according to the polling rate.
+#define NUM_BUT_POLLS 3
 
-// *******************************************************
-// initButtons: Initialise the variables associated with the set of buttons
-// defined by the constants above.
-void
-initButtons(void);
 
-// *******************************************************
-// updateButtons: Function designed to be called regularly. It polls all
+// ****************************************************************************
+// Initialise the variables associated with the set of buttons defined by the
+// constants above.
+// ****************************************************************************
+void initButtons(void);
+
+// ****************************************************************************
+// Function designed to be called regularly. It polls all of the
 // buttons once and updates variables associated with the buttons if
 // necessary.  It is efficient enough to be part of an ISR, e.g. from
 // a SysTick interrupt.
-void
-updateButtons(void);
+// ****************************************************************************
+void updateButtons(void);
 
-// *******************************************************
-// checkButton: Function returns the new button state if the button state
+// ****************************************************************************
+// Function returns the new button state if the button state
 // (PUSHED or RELEASED) has changed since the last call, otherwise returns
 // NO_CHANGE.  The argument butName should be one of constants in the
 // enumeration butStates, excluding 'NUM_BUTS'. Safe under interrupt.
-buttonState_t
-checkButton(buttonName_t butName);
+// ****************************************************************************
+buttonState_t checkButton(buttonName_t butName);
+
 
 #endif  // BUTTONS4_H_
