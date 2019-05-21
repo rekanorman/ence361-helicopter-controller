@@ -17,6 +17,7 @@
 #include "driverlib/adc.h"
 #include "driverlib/sysctl.h"
 #include "circBufT.h"
+#include "flightState.h"
 
 #include "altitude.h"
 
@@ -174,10 +175,23 @@ void altitudeChangeDesired(int16_t amount) {
 }
 
 //*****************************************************************************
-// Sets the desired altitude to the given value.
+// Called when the altitude is being reduced to zero for landing. Decreases
+// the desired altitude by the given amount, changing the flight state to
+// landed and stopping the rotors if the altitude has reached zero.
 //*****************************************************************************
-void altitudeSetDesired(int16_t altitude) {
-    desiredAltitude = altitude;
+void altitudeUpdateLanding(int16_t amount) {
+    if (desiredAltitude > MIN_ALTITUDE) {
+        desiredAltitude -= amount;
+        if (desiredAltitude < MIN_ALTITUDE) {
+            desiredAltitude = MIN_ALTITUDE;
+        }
+    } else if (desiredAltitude == MIN_ALTITUDE) {
+        if (altitudeError() == 0) {
+            stopMainRotor();
+            stopTailRotor();
+            setFlightState(LANDED);
+        }
+    }
 }
 
 //*****************************************************************************

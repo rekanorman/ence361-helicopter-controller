@@ -40,9 +40,6 @@
 #define DEGREES_IN_CIRCLE           360
 #define YAW_CHANGE_PER_SLOT         4
 
-// The step size used when rotating the helicopter to find the reference point.
-#define YAW_FIND_REFERENCE_STEP     15
-
 
 //*****************************************************************************
 // Static variables
@@ -159,17 +156,6 @@ static void yawReferenceIntHandler(void) {
 }
 
 //*****************************************************************************
-// If the helicopter is currently taking off, the desired yaw is incremented
-// periodically to rotate the helicopter in steps until the yaw reference point
-// is found.
-//*****************************************************************************
-void yawFindReference (void) {
-    if (getFlightState() == FINDING_YAW_REFERENCE) {
-        yawChangeDesired(YAW_FIND_REFERENCE_STEP);
-    }
-}
-
-//*****************************************************************************
 // Takes an arbitrary yaw value in degrees, and converts it to an equivalent
 // value in the range of -180 to 180 degrees.
 //*****************************************************************************
@@ -205,11 +191,26 @@ void yawChangeDesired(int16_t amount) {
 }
 
 //*****************************************************************************
-// Sets the desired yaw to the given value, ensuring it is in the range of
-// -180 to 180 degrees.
+// Called when the helicopter is returning to the reference yaw for landing.
+// Moves the desired yaw towards zero by the given amount. If the yaw has
+// reached the reference, changes the state of the helicopter.
 //*****************************************************************************
-void yawSetDesired(int16_t yaw) {
-    desiredYaw = convertYawToRange(yaw);
+void yawUpdateLanding(int16_t amount) {
+    if (desiredYaw < 0) {
+        desiredYaw += amount;
+        if (desiredYaw > 0) {
+            desiredYaw = 0;
+        }
+    } else if (desiredYaw > 0) {
+        desiredYaw -= amount;
+        if (desiredYaw < 0) {
+            desiredYaw = 0;
+        }
+    } else {    // desiredYaw == 0
+        if (yawError() == 0) {
+            setFlightState(LANDING_ALTITUDE);
+        }
+    }
 }
 
 //*****************************************************************************

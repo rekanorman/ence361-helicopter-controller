@@ -39,10 +39,11 @@ int16_t yawDegrees(void);
 void yawChangeDesired(int16_t amount);
 
 //*****************************************************************************
-// Sets the desired yaw to the given value, ensuring it is in the range of
-// -180 to 180 degrees.
+// Called when the helicopter is returning to the reference yaw for landing.
+// Moves the desired yaw towards zero by the given amount. If the yaw has
+// reached the reference, changes the state of the helicopter.
 //*****************************************************************************
-void yawSetDesired(int16_t yaw);
+void yawUpdateLanding(int16_t amount);
 
 //*****************************************************************************
 // Returns the desired yaw in degrees.

@@ -48,9 +48,11 @@ int16_t altitudePercent(void);
 void altitudeChangeDesired(int16_t amount);
 
 //*****************************************************************************
-// Sets the desired altitude to the given value.
+// Called when the altitude is being reduced to zero for landing. Decreases
+// the desired altitude by the given amount, changing the flight state to
+// landed and stopping the rotors if the altitude has reached zero.
 //*****************************************************************************
-void altitudeSetDesired(int16_t altitude);
+void altitudeUpdateLanding(int16_t amount);
 
 //*****************************************************************************
 // Returns the desired percentage altitude.

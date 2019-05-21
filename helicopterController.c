@@ -36,10 +36,9 @@
 #define CONTROL_UPDATE_RATE_HZ         20
 #define DISPLAY_UPDATE_RATE_HZ         5
 #define BUTTON_CHECK_RATE_HZ           10
-#define SWITCH_CHECK_RATE_HZ           5
+#define SWITCH_CHECK_RATE_HZ           10
 #define UART_SEND_RATE_HZ              4
-#define YAW_REFRENCE_STEP_RATE_HZ      2
-#define CHECK_LANDING_RATE_HZ          5
+#define UPDATE_TAKEOFF_LANDING_RATE_HZ 2
 
 // Altitude sampling is the highest frequency task, so use this as SysTick rate.
 #define SYSTICK_RATE_HZ                ALTITUDE_SAMPLE_RATE_HZ
@@ -126,24 +125,22 @@ void checkSwitch(void) {
         setFlightState(FINDING_YAW_REFERENCE);
 
     } else if (switchState == SWITCH_DOWN && getFlightState() == FLYING) {
-        yawSetDesired(0);
         setFlightState(LANDING_YAW);
     }
 }
 
 //*****************************************************************************
-// If the helicopter is currently landing (trying to restore either the yaw
-// or the altitude to zero), checks whether the error has reached zero and
-// changes the state of the helicopter as necessary.
+// If the helicopter is currently taking off (finding the reference yaw signal)
+// or landing, updates the desired yaw or altitude, or changes
+// the flight state of the helicopter as necessary.
 //*****************************************************************************
-void checkLanding(void) {
-    if (getFlightState() == LANDING_YAW && yawError() == 0) {
-        altitudeSetDesired(0);
-        setFlightState(LANDING_ALTITUDE);
-    } else if (getFlightState() == LANDING_ALTITUDE && altitudeError() == 0) {
-        stopMainRotor();
-        stopTailRotor();
-        setFlightState(LANDED);
+void updateTakeOffOrLanding(void) {
+    if (getFlightState() == FINDING_YAW_REFERENCE) {
+        yawChangeDesired(YAW_STEP_DEGREES);
+    } else if (getFlightState() == LANDING_YAW) {
+        yawUpdateLanding(YAW_STEP_DEGREES);
+    } else if (getFlightState() == LANDING_ALTITUDE) {
+        altitudeUpdateLanding(ALTITUDE_STEP_PERCENT);
     }
 }
 
@@ -166,17 +163,15 @@ int main(void) {
 
     // Initialise the scheduler and register the background tasks with it.
     // Tasks are registered in order of priority, with highest first.
-    initScheduler(7);
+    initScheduler(6);
     schedulerRegisterTask(controlUpdate,
                           SYSTICK_RATE_HZ / CONTROL_UPDATE_RATE_HZ);
-    schedulerRegisterTask(yawFindReference,
-                          SYSTICK_RATE_HZ / YAW_REFRENCE_STEP_RATE_HZ);
     schedulerRegisterTask(checkButtons,
                           SYSTICK_RATE_HZ / BUTTON_CHECK_RATE_HZ);
     schedulerRegisterTask(checkSwitch,
                           SYSTICK_RATE_HZ / SWITCH_CHECK_RATE_HZ);
-    schedulerRegisterTask(checkLanding,
-                          SYSTICK_RATE_HZ / CHECK_LANDING_RATE_HZ);
+    schedulerRegisterTask(updateTakeOffOrLanding,
+                          SYSTICK_RATE_HZ / UPDATE_TAKEOFF_LANDING_RATE_HZ);
     schedulerRegisterTask(displayUpdate,
                           SYSTICK_RATE_HZ / DISPLAY_UPDATE_RATE_HZ);
     schedulerRegisterTask(uartSendStatus,
