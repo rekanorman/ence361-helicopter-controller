@@ -90,6 +90,10 @@ void initSysTick(void) {
 // Note: buttons are updated regularly in the SysTickIntHandler.
 //*****************************************************************************
 void checkButtons(void) {
+    if (checkButton(RESET) == PUSHED) {
+        SysCtlReset();
+    }
+
     if (getFlightState() == FLYING) {
         if (checkButton(RIGHT) == PUSHED) {
             yawChangeDesired(YAW_STEP_DEGREES);
@@ -105,10 +109,6 @@ void checkButtons(void) {
 
         if (checkButton(DOWN) == PUSHED) {
             altitudeChangeDesired(-ALTITUDE_STEP_PERCENT);
-        }
-
-        if (checkButton(RESET) == PUSHED) {
-            SysCtlReset();
         }
     }
 }
