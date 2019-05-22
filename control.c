@@ -26,9 +26,9 @@
 #define CONTROL_KP_ALTITUDE         6
 #define CONTROL_KD_ALTITUDE         1
 #define CONTROL_KI_ALTITUDE         2
-#define CONTROL_KP_YAW              10
+#define CONTROL_KP_YAW              12
 #define CONTROL_KD_YAW              3
-#define CONTROL_KI_YAW              2
+#define CONTROL_KI_YAW              3
 
 
 //*****************************************************************************
