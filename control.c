@@ -6,7 +6,7 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module implementing PI control for the altitude and yaw of the helicopter.
+// Module implementing PID control for the altitude and yaw of the helicopter.
 //
 //*****************************************************************************
 
@@ -23,6 +23,9 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
+
+// PID gains for the altitude and the yaw. Stored as ten times their actual
+// values to avoid floating-point arithmetic.
 #define CONTROL_KP_ALTITUDE         6
 #define CONTROL_KD_ALTITUDE         1
 #define CONTROL_KI_ALTITUDE         2

@@ -6,7 +6,7 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module implementing PI control for the altitude and yaw of the helicopter.
+// Module implementing PID control for the altitude and yaw of the helicopter.
 //
 //*****************************************************************************
 
