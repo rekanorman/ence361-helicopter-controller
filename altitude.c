@@ -17,6 +17,7 @@
 #include "driverlib/adc.h"
 #include "driverlib/sysctl.h"
 #include "circBufT.h"
+#include "rotors.h"
 #include "flightState.h"
 
 #include "altitude.h"
@@ -25,7 +26,7 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define BUF_SIZE                20
+#define BUF_SIZE                20    // Number of ADC samples to average.
 
 #define MIN_ALTITUDE            0
 #define MAX_ALTITUDE            100
@@ -34,7 +35,7 @@
 // Calculated as: 4095 * (0.8V / 3.3V)
 #define ADC_RANGE               993
 
-// Constants related to ADC peripheral.
+// Constants related to the ADC peripheral.
 #define ALTITUDE_ADC_PERIPH             SYSCTL_PERIPH_ADC0
 #define ALTITUDE_ADC_BASE               ADC0_BASE
 #define ALTITUDE_ADC_SEQUENCE           3
@@ -54,6 +55,7 @@ static int16_t referenceADC;  // ADC value corresponding to 'landed' altitude.
 // Number of ADC samples taken, used to check whether buffer is filled yet.
 static uint32_t numSamplesTaken = 0;
 
+// The desired altitude as a percentage.
 static int16_t desiredAltitude = 0;
 
 
@@ -147,14 +149,13 @@ static void altitudeADCIntHandler(void) {
     sumADC = sumADC - oldestValue + newValue;
     meanADC = (2 * sumADC + BUF_SIZE) / 2 / BUF_SIZE;
 
-    // Clean up, clearing the interrupt
+    // Clean up, clearing the interrupt.
     ADCIntClear(ALTITUDE_ADC_BASE, ALTITUDE_ADC_SEQUENCE);
 }
 
 //*****************************************************************************
-// Calculates and returns the current percentage altitude, based on the mean
-// sample value and relative to the global referenceSample, which represents
-// the landed altitude. Percentage can be positive or negative.
+// Calculates and returns the current percentage altitude, relative to the
+// referenceADC value. Percentage can be positive or negative.
 //*****************************************************************************
 int16_t altitudePercent(void) {
     return (referenceADC - meanADC) * 100 / ADC_RANGE;

@@ -6,7 +6,7 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module measuring the yaw angle using pin change interrupts.
+// Module for measuring the yaw angle using pin change interrupts.
 //
 //*****************************************************************************
 
@@ -19,12 +19,6 @@
 // measuring the yaw.
 //*****************************************************************************
 void initYaw(void);
-
-//*****************************************************************************
-// If the helicopter is currently taking off, the desired yaw is incremented
-// to rotate the helicopter in steps until the yaw reference point is found.
-//*****************************************************************************
-void yawFindReference (void);
 
 //*****************************************************************************
 // Calculate and return the yaw in degrees, relative to the reference position.

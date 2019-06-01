@@ -35,9 +35,8 @@ void altitudeSetReference(void);
 void altitudeTriggerConversion(void);
 
 //*****************************************************************************
-// Calculates and returns the current percentage altitude, based on the mean
-// sample value and relative to the global referenceSample, which represents
-// the landed altitude. Percentage can be positive or negative
+// Calculates and returns the current percentage altitude, relative to the
+// referenceADC value. Percentage can be positive or negative.
 //*****************************************************************************
 int16_t altitudePercent(void);
 

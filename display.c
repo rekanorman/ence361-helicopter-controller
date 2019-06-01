@@ -6,8 +6,8 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module for displaying information about the altitude and yaw angle on the
-// OLED display.
+// Module for displaying information about the current altitude, yaw angle
+// and main and tail motor powers on the OLED display.
 //
 //*****************************************************************************
 
@@ -17,6 +17,7 @@
 #include "OrbitOLED/OrbitOLEDInterface.h"
 #include "altitude.h"
 #include "yaw.h"
+#include "rotors.h"
 
 #include "display.h"
 
@@ -32,7 +33,6 @@
 // Initialise the display.
 //*****************************************************************************
 void initDisplay(void) {
-    // Intialise the Orbit OLED display
     OLEDInitialise();
 }
 
@@ -42,15 +42,15 @@ void initDisplay(void) {
 void displayUpdate(void) {
     char line[MAX_STR_LEN + 1];
 
-    usnprintf(line, sizeof(line), "Alt: %5d%%     ", altitudePercent());
+    usnprintf(line, sizeof(line), "Alt: %5d%%", altitudePercent());
     OLEDStringDraw(line, 0, 0);
 
-    usnprintf(line, sizeof(line), "Yaw: %5d deg  ", yawDegrees());
+    usnprintf(line, sizeof(line), "Yaw: %5d deg", yawDegrees());
     OLEDStringDraw(line, 0, 1);
 
-    usnprintf(line, sizeof(line), "Main: %4d%%     ", yawDegrees());
+    usnprintf(line, sizeof(line), "Main: %4d%%", getMainRotorPower());
     OLEDStringDraw(line, 0, 2);
 
-    usnprintf(line, sizeof(line), "Tail: %4d%%     ", yawDegrees());
+    usnprintf(line, sizeof(line), "Tail: %4d%%", getTailRotorPower());
     OLEDStringDraw(line, 0, 3);
 }

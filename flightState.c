@@ -43,6 +43,6 @@ char* flightStateString(void) {
         case FLYING: return "Flying";
         case LANDING_YAW: return "Landing";
         case LANDING_ALTITUDE: return "Landing";
+        default: return "";
     }
-    return "";
 }

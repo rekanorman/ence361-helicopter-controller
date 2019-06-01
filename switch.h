@@ -6,7 +6,7 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module for Switch 1 of the on the ORBIT daughter board.
+// Module for Switch 1 on the ORBIT daughter board.
 //
 //*****************************************************************************
 
@@ -14,7 +14,7 @@
 #define SWITCH_H_
 
 
-// Type for the state of the switch SWITCH_UP and SWITCH_DOWN mean that the
+// Type for the state of the switch. SWITCH_UP and SWITCH_DOWN mean that the
 // switch has been moved since it was last checked.
 enum switchStates {SWITCH_UNCHANGED = 0, SWITCH_UP, SWITCH_DOWN};
 typedef enum switchStates switchState_t;
@@ -27,7 +27,8 @@ void initSwitch();
 
 //*****************************************************************************
 // Checks if the switch position has changed since the last call, and updates
-// the switch state as necessary.
+// the switch state as necessary. Should be called frequently, e.g. from a
+// SysTickIntHandler.
 //*****************************************************************************
 void updateSwitch1(void);
 

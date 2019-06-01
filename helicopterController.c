@@ -15,7 +15,6 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
 #include "driverlib/interrupt.h"
-#include "driverlib/debug.h"
 #include "buttons4.h"
 #include "switch.h"
 #include "circBufT.h"
@@ -32,16 +31,16 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-#define ALTITUDE_SAMPLE_RATE_HZ        400
-#define CONTROL_UPDATE_RATE_HZ         20
-#define DISPLAY_UPDATE_RATE_HZ         5
-#define BUTTON_CHECK_RATE_HZ           10
-#define SWITCH_CHECK_RATE_HZ           10
-#define UART_SEND_RATE_HZ              4
-#define UPDATE_TAKEOFF_LANDING_RATE_HZ 2
+#define ALTITUDE_SAMPLE_RATE_HZ            400
+#define CONTROL_UPDATE_RATE_HZ             20
+#define BUTTON_CHECK_RATE_HZ               10
+#define SWITCH_CHECK_RATE_HZ               10
+#define DISPLAY_UPDATE_RATE_HZ             5
+#define UART_SEND_RATE_HZ                  4
+#define UPDATE_TAKEOFF_LANDING_RATE_HZ     2
 
 // Altitude sampling is the highest frequency task, so use this as SysTick rate.
-#define SYSTICK_RATE_HZ                ALTITUDE_SAMPLE_RATE_HZ
+#define SYSTICK_RATE_HZ          ALTITUDE_SAMPLE_RATE_HZ
 
 // The amount by which altitude and yaw change when the buttons are pushed.
 #define ALTITUDE_STEP_PERCENT    10
@@ -62,7 +61,6 @@ void SysTickIntHandler(void) {
 // Initialise the clock, setting the rate to 20MHz
 //*****************************************************************************
 void initClock(void) {
-    // Set the clock rate to 20 MHz
     SysCtlClockSet(SYSCTL_SYSDIV_10 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN |
                    SYSCTL_XTAL_16MHZ);
 }
@@ -75,10 +73,10 @@ void initSysTick(void) {
     // Set up the period for the SysTick timer.
     SysTickPeriodSet(SysCtlClockGet() / SYSTICK_RATE_HZ);
 
-    // Register the interrupt handler
+    // Register the interrupt handler.
     SysTickIntRegister(SysTickIntHandler);
 
-    // Enable the interrupt and the device
+    // Enable the interrupt and the device.
     SysTickIntEnable();
     SysTickEnable();
 }
@@ -89,10 +87,7 @@ void initSysTick(void) {
 // Note: buttons are updated regularly in the SysTickIntHandler.
 //*****************************************************************************
 void checkButtons(void) {
-    if (checkButton(RESET) == PUSHED) {
-        SysCtlReset();
-    }
-
+    // The altitude and yaw should only be changed if the helicopter is flying.
     if (getFlightState() == FLYING) {
         if (checkButton(RIGHT) == PUSHED) {
             yawChangeDesired(YAW_STEP_DEGREES);
@@ -131,8 +126,8 @@ void checkSwitch(void) {
 
 //*****************************************************************************
 // If the helicopter is currently taking off (finding the reference yaw signal)
-// or landing, updates the desired yaw or altitude, or changes
-// the flight state of the helicopter as necessary.
+// or landing, updates the desired yaw or altitude, or changes the flight
+// state of the helicopter as necessary.
 //*****************************************************************************
 void updateTakeOffOrLanding(void) {
     if (getFlightState() == FINDING_YAW_REFERENCE) {

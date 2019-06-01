@@ -6,7 +6,7 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module for Switch 1 of the on the ORBIT daughter board.
+// Module for Switch 1 on the ORBIT daughter board.
 //
 //*****************************************************************************
 
@@ -31,7 +31,11 @@
 //*****************************************************************************
 // Static variables
 //*****************************************************************************
-bool switchPosition;   // Current position of the switch, true means up.
+
+// Current position of the switch, true means up.
+bool switchPosition;
+
+// Whether the switch position has changed since the last call to checkSwitch1
 bool switchPositionChanged = false;
 
 
@@ -44,16 +48,17 @@ void initSwitch() {
     GPIOPadConfigSet(SWITCH_1_PORT_BASE, SWITCH_1_PIN, GPIO_STRENGTH_2MA,
                      GPIO_PIN_TYPE_STD_WPD);
     switchPosition = GPIOPinRead(SWITCH_1_PORT_BASE, SWITCH_1_PIN)
-                         == SWITCH_1_PIN;
+                      == SWITCH_1_PIN;
 }
 
 //*****************************************************************************
 // Checks if the switch position has changed since the last call, and updates
-// the switch state as necessary.
+// the switch state as necessary. Should be called frequently, e.g. from a
+// SysTickIntHandler.
 //*****************************************************************************
 void updateSwitch1(void) {
     bool newSwitchPosition = GPIOPinRead(SWITCH_1_PORT_BASE, SWITCH_1_PIN)
-                            == SWITCH_1_PIN;
+                              == SWITCH_1_PIN;
     if (newSwitchPosition != switchPosition) {
         switchPositionChanged = true;
     }
@@ -75,5 +80,4 @@ switchState_t checkSwitch1() {
     } else {
         return SWITCH_UNCHANGED;
     }
-
 }

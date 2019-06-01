@@ -21,8 +21,8 @@
 
 //*****************************************************************************
 // Task structure, containing a callback to run the task, the number of ticks
-// after which the task should be run, and a counter to keep track of the
-// current number of ticks.
+// after which the task should be run, a counter to keep track of the current
+// number of ticks, and a flag indicating whether it's time to run the task.
 //*****************************************************************************
 typedef struct {
     void (*runTask)(void);

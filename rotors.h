@@ -6,7 +6,8 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module for controlling the rotor blades of the helicopter.
+// Module for controlling the motors powering the main and tail rotors of
+// the helicopter.
 //
 //*****************************************************************************
 
@@ -17,6 +18,10 @@
 //*****************************************************************************
 // Public constants
 //*****************************************************************************
+
+// Range of allowed duty cycles for the main and tail motors. The minimum main
+// motor power is set to 20% to ensure that anticlockwise rotation is possible
+// even when the main motor is at its minimum.
 #define PWM_MAX_DUTY        95
 #define PWM_MAIN_MIN_DUTY   20
 #define PWM_TAIL_MIN_DUTY   5

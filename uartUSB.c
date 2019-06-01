@@ -53,8 +53,8 @@
 #define UART_PAR_BIT        UART_CONFIG_PAR_NONE
 #define UART_CONFIG         UART_WORD_LEN | UART_STOP_BIT | UART_PAR_BIT
 
-// The maximum length of strings sent via UART.
-#define MAX_STR_LEN         16
+// The number of characters to send over UART at a time.
+#define STR_LEN             18
 
 
 //*****************************************************************************
@@ -83,22 +83,24 @@ void initUart (void) {
 // Transmits a message containing information about the status of the program.
 //*****************************************************************************
 void uartSendStatus(void) {
-    char status[MAX_STR_LEN + 1];
+    char line[STR_LEN + 1];
 
-    usprintf(status, "Alt: %4d [%4d]\r\n", altitudePercent(), altitudeDesired());
-    uartSend(status);
+    usnprintf(line, sizeof(line),
+              "Alt: %4d [%4d]\r\n", altitudePercent(), altitudeDesired());
+    uartSend(line);
 
-    usprintf(status, "Yaw: %4d [%4d]\r\n", yawDegrees(), yawDesired());
-    uartSend(status);
+    usnprintf(line, sizeof(line),
+              "Yaw: %4d [%4d]\r\n", yawDegrees(), yawDesired());
+    uartSend(line);
 
-    usprintf(status, "Main: %5d%%  \r\n", getMainRotorPower());
-    uartSend(status);
+    usnprintf(line, sizeof(line), "Main: %4d%%\r\n", getMainRotorPower());
+    uartSend(line);
 
-    usprintf(status, "Tail: %5d%%  \r\n", getTailRotorPower());
-    uartSend(status);
+    usnprintf(line, sizeof(line), "Tail: %4d%%\r\n", getTailRotorPower());
+    uartSend(line);
 
-    usprintf(status, "%14s\r\n", flightStateString());
-    uartSend(status);
+    usnprintf(line, sizeof(line), "%16s\r\n", flightStateString());
+    uartSend(line);
 }
 
 //*****************************************************************************

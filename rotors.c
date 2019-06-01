@@ -6,7 +6,8 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module for controlling the rotor blades of the helicopter.
+// Module for controlling the motors powering the main and tail rotors of
+// the helicopter.
 //
 //*****************************************************************************
 
@@ -24,7 +25,6 @@
 //*****************************************************************************
 // Constants
 //*****************************************************************************
-
 #define PWM_DIVIDER_CODE           SYSCTL_PWMDIV_4
 #define PWM_DIVIDER                4
 
@@ -57,7 +57,7 @@
 // Static variables
 //*****************************************************************************
 
-// Percentage power of rotors.
+// Current duty cycle of the two motors.
 static uint16_t mainRotorPower = 0;
 static uint16_t tailRotorPower = 0;
 

@@ -6,7 +6,7 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module measuring the yaw angle using pin change interrupts.
+// Module for measuring the yaw angle using pin change interrupts.
 //
 //*****************************************************************************
 
@@ -16,7 +16,6 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 #include "flightState.h"
-#include "altitude.h"
 
 #include "yaw.h"
 
@@ -93,7 +92,8 @@ void initYaw(void) {
 //*****************************************************************************
 // The pin change interrupt handler for the pins used to measure yaw
 // channels A and B. Compares the current values of the two input yaw
-// channels to their previous values and updates the yaw value as needed.
+// channels to their previous values to determine the direction of rotation
+// and updates the yaw value as needed.
 //*****************************************************************************
 static void yawChannelIntHandler(void) {
     // Variables to keep track of whether each yaw channel was HIGH the last
@@ -107,6 +107,8 @@ static void yawChannelIntHandler(void) {
     bool currentChannelB = GPIOPinRead(YAW_GPIO_BASE, YAW_CHANNEL_B_PIN)
                            == YAW_CHANNEL_B_PIN;
 
+    // Uses the previous and current values of channel A and channel B to
+    // determine the direction of rotation, and update the yaw value as needed.
     if (!previousChannelA &&  !previousChannelB) {
         if (!currentChannelA && currentChannelB) {
             yawChange += 1;
@@ -143,7 +145,8 @@ static void yawChannelIntHandler(void) {
 // The pin change interrupt handler for the yaw reference pin. If the
 // helicopter is currently taking off, and therefore trying to find the yaw
 // reference point, the interrupt handler will reset the current yaw value
-// to zero. Otherwise the interrupt is ignored.
+// to zero and update the helicopter's flight state.
+// Otherwise the interrupt is ignored.
 //*****************************************************************************
 static void yawReferenceIntHandler(void) {
     if (getFlightState() == FINDING_YAW_REFERENCE) {
@@ -187,7 +190,6 @@ int16_t yawDegrees(void) {
 //*****************************************************************************
 void yawChangeDesired(int16_t amount) {
     desiredYaw = convertYawToRange(desiredYaw + amount);
-
 }
 
 //*****************************************************************************

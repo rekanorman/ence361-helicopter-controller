@@ -6,8 +6,8 @@
 //          Matthew Toohey (mct63)
 //          James Brazier (jbr185)
 //
-// Module for displaying information about the altitude and yaw angle on the
-// OLED display.
+// Module for displaying information about the current altitude, yaw angle
+// and main and tail motor powers on the OLED display.
 //
 //*****************************************************************************
 

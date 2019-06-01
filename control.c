@@ -15,7 +15,6 @@
 #include "altitude.h"
 #include "yaw.h"
 #include "rotors.h"
-#include "flightState.h"
 
 #include "control.h"
 
@@ -110,8 +109,8 @@ static void controlUpdateYaw(void) {
                                   + error * 100 / controlUpdateRate;
 
     int16_t tailRotorDuty = (CONTROL_KP_YAW * error * 100
-                        + CONTROL_KD_YAW * errorDerivative * 100
-                        + CONTROL_KI_YAW * newIntegratedError) / 1000;
+                             + CONTROL_KD_YAW * errorDerivative * 100
+                             + CONTROL_KI_YAW * newIntegratedError) / 1000;
 
     yawErrorPrevious = error;
 
@@ -127,8 +126,3 @@ static void controlUpdateYaw(void) {
 
     setTailRotorPower(tailRotorDuty);
 }
-
-
-
-
-
